@@ -478,3 +478,19 @@ body.tablet-landscape[data-page="battle"] main{padding:8px;flex:1 1 auto;height:
  .tablet-landscape[data-page="practice"] .top-right .voice-toggle,
  .tablet-landscape[data-page="battle"] .top-right .voice-toggle{min-height:42px;height:42px;}
 }
+
+/* Discreet, findable software version detail on the backup page. */
+#library .section-heading .app-about-entry{
+  background:transparent;color:#64766e;border:0;font-size:.8rem;
+  min-width:72px;min-height:44px;padding:5px 9px;flex:0 0 auto;
+  font-weight:550;
+}
+#library .section-heading .app-about-entry:hover,
+#library .section-heading .app-about-entry:focus-visible{color:#205c49;background:#edf3e8;}
+.app-about-dialog{max-width:480px;}
+.app-about-dialog .modal-body{margin-top:8px;}
+.app-about-dialog .modal-body p{margin:10px 0;font-size:.92rem;}
+.app-about-dialog .app-about-version{font-size:1.08rem!important;}
+@media(max-height:540px) and (orientation:landscape){
+ #library .section-heading .app-about-entry{padding:3px 7px;font-size:.75rem;}
+}
