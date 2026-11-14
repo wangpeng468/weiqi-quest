@@ -1,0 +1,24 @@
+/* Keep the visible About dialog aligned with the Android APK version. */
+'use strict';
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const html=fs.readFileSync('assets/index.html','utf8');
+const app=fs.readFileSync('web-src/app.js','utf8');
+const pack=fs.readFileSync('package_apk.py','utf8');
+const version=pack.match(/VERSION='([^']+)';VERSION_CODE=(\d+)/);
+assert(version,'APK version definition missing');
+const [_,name,code]=version;
+assert.match(html,/id="appAboutButton"[^>]+aria-controls="appAboutDialog"/);
+assert.match(html,/id="appAboutDialog"[^>]+hidden[^>]+role="dialog"/);
+assert.match(html,/<strong>v[^<]+<\/strong>/);
+assert(html.includes('<strong>v'+name+'</strong>'),'Visible version must match AndroidManifest versionName');
+assert(html.includes('版本代码：'+code),'Visible versionCode must match AndroidManifest versionCode');
+assert(!html.includes('当前版本：2.8.0'),'Old hardcoded version must be removed');
+assert(app.includes("('appAboutButton').onclick"),'Open action must be wired');
+assert(app.includes("('closeAppAbout').onclick"),'Close action must be wired');
+assert(app.includes("('appAboutDialog').hidden=true"),'Escape must dismiss dialog');
+const board=html.indexOf('<section id="practice"');
+const library=html.indexOf('<section id="library"');
+const entry=html.indexOf('id="appAboutButton"');
+assert(entry>library && entry>board,'About entry belongs on backup page, not on board');
+console.log('PASS About/version entry, dialog, exact v'+name+' / '+code+', close, and board-space safety');
