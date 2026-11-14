@@ -134,7 +134,7 @@ function render(){
 function point(event){const r=$('battleBoard').getBoundingClientRect(),g=geometry;if(!g||!r.width)return -2;const x=(event.clientX-r.left)/r.width*600,y=(event.clientY-r.top)/r.height*600,xx=Math.round((x-g.margin)/g.step),yy=Math.round((y-g.margin)/g.step);if(xx<0||yy<0||xx>=g.n||yy>=g.n||Math.abs(x-g.margin-xx*g.step)>g.step*.48||Math.abs(y-g.margin-yy*g.step)>g.step*.48)return -2;return yy*g.n+xx;}
 function boardClick(event){const p=point(event);if(p<0)return;if(phase==='scoring'){if(!game.board[p])return;const stones=E.group(game.board,p,game.n).stones;const remove=dead.indexOf(p)>=0;if(remove)dead=dead.filter(q=>stones.indexOf(q)<0);else dead=dead.concat(stones.filter(q=>dead.indexOf(q)<0));save();renderBoard();speak(remove?'取消死子标记':'已标记死子');return;}if(phase!=='playing')return;if(busy||mode==='ai'&&game.turn!==human){speak('电脑在想');return;}apply(p,true);}
 function updateSetup(){$('battleSetup').dataset.mode=setup.mode;for(const el of document.querySelectorAll('[data-opponent]')){const selected=el.dataset.opponent===setup.mode;el.classList.toggle('active',selected);el.setAttribute('aria-pressed',String(selected));}for(const [selector,field] of [['[data-board-size]','n'],['[data-human]','human'],['[data-setup-difficulty]','difficulty']])for(const el of document.querySelectorAll(selector)){const value=Number(el.getAttribute(selector.slice(1,-1)));const selected=value===setup[field];el.classList.toggle('active',selected);el.setAttribute('aria-pressed',String(selected));}}
-function openSetup(){setup={n:game?game.n:9,human,difficulty,mode};updateSetup();$('battleSetup').hidden=false;speak('设置新对局');}
+function openSetup(){cancelAI();setup={n:game?game.n:9,human,difficulty,mode};updateSetup();$('battleSetup').hidden=false;speak('设置新对局');}
 function info(title,body){$('battleInfoClose').setAttribute('data-say',document.body.dataset.page==='progress'?'返回记录':'返回对战');$('battleInfoTitle').textContent=title;$('battleInfoBody').innerHTML=body;$('battleInfo').hidden=false;}
 function exportSGF(){if(!game)return;const coords=p=>p<0?'':String.fromCharCode(97+p%game.n,97+Math.floor(p/game.n));let s='(;GM[1]FF[4]CA[UTF-8]SZ['+game.n+']KM[7.5]PB['+(mode==='local'?'黑棋':human===1?'小棋手':'本地电脑')+']PW['+(mode==='local'?'白棋':human===2?'小棋手':'本地电脑')+']';if(result){s+='RE['+(result.winner===0?'0':(result.winner===1?'B':'W')+'+'+(result.reason==='resign'?'R':Math.abs(result.black-result.white-(result.komi==null?7.5:result.komi)) ))+']';if(result.provisional)s+='C[练习自动估算，死活未完全确认，结果需要复核。]';}for(const m of game.moves)s+=';'+(m.c===1?'B':'W')+'['+coords(m.p)+']';s+=')';host.download('围棋对战_'+new Date().toISOString().slice(0,10)+'.sgf',s,'application/x-go-sgf');}
 
@@ -191,8 +191,8 @@ function init(h){
  $('battleCorrect').onclick=beginScoring;
  $('battleContinueAfter').onclick=()=>ask('继续下这一局？','会撤回本局的胜负记录，恢复下棋；下完后再结算。其他对局和闯关成绩不变。','撤回结算说明',resumeGame,'▶ 继续下','对战继续下棋');
  $('battleOpenRecords').onclick=showRecords;
- $('battleDialogNo').onclick=closeDialog;$('battleDialogYes').onclick=()=>{const action=dialogAction;closeDialog();if(action)action();};
- $('battleSetupClose').onclick=()=>{$('battleSetup').hidden=true;};
+ $('battleDialogNo').onclick=()=>{closeDialog();scheduleAI();};$('battleDialogYes').onclick=()=>{const action=dialogAction;closeDialog();if(action)action();};
+ $('battleSetupClose').onclick=()=>{$('battleSetup').hidden=true;scheduleAI();};
  for(const el of document.querySelectorAll('[data-opponent]'))el.onclick=()=>{setup.mode=el.dataset.opponent;updateSetup();};
  for(const el of document.querySelectorAll('[data-board-size]'))el.onclick=()=>{setup.n=Number(el.dataset.boardSize);updateSetup();};
  for(const el of document.querySelectorAll('[data-human]'))el.onclick=()=>{setup.human=Number(el.dataset.human);updateSetup();};
@@ -204,7 +204,7 @@ function init(h){
  for(const el of document.querySelectorAll('[data-record-view]'))el.onclick=()=>setRecordView(el.dataset.recordView);
  for(const el of document.querySelectorAll('[data-record-filter]'))el.onclick=()=>{recordFilter=el.dataset.recordFilter;recordsPage=0;renderRecords();};
  $('battleRecordsPrev').onclick=()=>{recordsPage--;renderRecords();};$('battleRecordsNext').onclick=()=>{recordsPage++;renderRecords();};
- $('battleRecordsPlay').onclick=()=>{const want=host.getState().recordView==='local'?'local':'ai';host.showTab('battle');if(mode!==want){setup={n:game?game.n:9,human,difficulty,mode:want};updateSetup();$('battleSetup').hidden=false;}};
+ $('battleRecordsPlay').onclick=()=>{const want=host.getState().recordView==='local'?'local':'ai';host.showTab('battle');if(mode!==want){cancelAI();setup={n:game?game.n:9,human,difficulty,mode:want};updateSetup();$('battleSetup').hidden=false;}};
  $('battleRecordList').addEventListener('click',e=>{const el=e.target.closest('[data-record-id]');if(!el)return;const r=history().find(x=>x.id===el.dataset.recordId);if(!r)return;info('这局：'+recordOutcome(r),'<p>'+esc(new Date(r.date).toLocaleString('zh-CN'))+' · '+r.n+' 路 · '+(r.mode==='local'?'双人对战':labels[r.difficulty]+'难度 · 你执'+(r.human===1?'黑棋':'白棋'))+'</p><p><b>'+recordScore(r)+'</b></p><p>'+(r.provisional?'本局为自动练习估算，未确定的棋块按存活暂计；不是经确认的最终死活判决。':r.reason==='resign'?'认输结算。':r.method==='manual'?'已按家长确认的死子标记计分。':r.method==='legacy'?'这是升级前的记录。旧版未保存黑白具体分数，无法补出。':'按盘面面积自动计分。')+'</p><p class="muted">'+(r.mode==='local'?'双人对战分别记录黑棋和白棋，不计算个人胜率。':'人机胜率按最近保存的全部结果计算，估算记录也包含在内。')+'</p>');});
  window.addEventListener('resize',()=>{if(document.body.dataset.page==='progress')renderRecords();});
  $('battleReview').onclick=()=>info('看看这盘棋','<p>棋盘保留了最终局面。想逐手回看，请导出这盘 SGF，然后在“备份”页导入，即可用看谱功能逐手查看。</p><button id="battleExportSGF" class="primary wide" data-say="导出对战棋谱">▣ 导出这盘 SGF</button>');
