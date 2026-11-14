@@ -46,6 +46,12 @@ jobs:
           npm install --no-audit --no-fund
           npm run web
 
+      - name: Test offline Go rules and two-player records
+        run: |
+          node test_battle_rules.cjs
+          node test_auto_scoring.cjs
+          node test_two_player.cjs
+
       - name: Install APK tooling
         run: python -m pip install 'cryptography>=41' 'cairosvg>=2.7'
 
