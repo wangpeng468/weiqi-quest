@@ -147,27 +147,31 @@ function importProgress(incoming){
  }
  renderRecords();
 }
-function recordOutcome(r){return r.winner===0?'和棋':r.winner===r.human?'你赢了':'电脑赢了';}
-function recordVoice(r){return r.provisional?(r.winner===0?'估算和棋':r.winner===r.human?'估算你赢了':'估算电脑赢了'):(r.winner===0?'记录和棋':r.winner===r.human?'记录你赢了':'记录电脑赢了');}
-function recordScore(r){return r.reason==='resign'?'认输结束':r.black==null?'旧版记录 · 未保存分数':'● '+r.black+' · ○ '+r.white+' + '+r.komi+(r.winner===0?' · 和棋':' · 胜 '+r.margin+' 点');}
-function setRecordView(view){host.getState().recordView=view==='battle'?'battle':'lessons';host.save();renderRecords();}
-function showRecords(){host.getState().recordView='battle';host.save();host.showTab('progress');renderRecords();}
-function summary(rows){const win=rows.filter(r=>r.winner===r.human).length,draw=rows.filter(r=>r.winner===0).length,loss=rows.length-win-draw;return {total:rows.length,win,loss,draw,provisional:rows.filter(r=>r.provisional).length,rate:rows.length?Math.round(win/rows.length*100):0};}
+function recordOutcome(r){return r.winner===0?'和棋':r.mode==='local'?(r.winner===1?'黑棋胜':'白棋胜'):r.winner===r.human?'你赢了':'电脑赢了';}
+function recordVoice(r){if(r.mode==='local')return r.winner===0?'记录和棋':'对战结果已保存';return r.provisional?(r.winner===0?'估算和棋':r.winner===r.human?'估算你赢了':'估算电脑赢了'):(r.winner===0?'记录和棋':r.winner===r.human?'记录你赢了':'记录电脑赢了');}
+function recordScore(r){return r.reason==='resign'?'认输结束 · '+(r.mode==='local'?(r.winner===1?'黑棋胜':'白棋胜'):'胜负已记录'):r.black==null?'旧版记录 · 未保存分数':'● '+r.black+' · ○ '+r.white+' + '+r.komi+(r.winner===0?' · 和棋':' · 胜 '+r.margin+' 点');}
+function setRecordView(view){host.getState().recordView=['lessons','battle','local'].indexOf(view)>=0?view:'lessons';recordsPage=0;recordFilter='all';host.save();renderRecords();}
+function showRecords(){host.getState().recordView=mode==='local'?'local':'battle';recordsPage=0;recordFilter='all';host.save();host.showTab('progress');renderRecords();}
+function summary(rows){const local=rows.length>0&&rows[0].mode==='local',win=rows.filter(r=>r.winner===(local?1:r.human)).length,draw=rows.filter(r=>r.winner===0).length,loss=rows.length-win-draw;return {total:rows.length,win,loss,draw,provisional:rows.filter(r=>r.provisional).length,rate:rows.length?Math.round(win/rows.length*100):0};}
 function renderRecords(){
  if(!host||!$('battleRecordsPane'))return;
- const isBattle=host.getState().recordView==='battle';
+ const view=host.getState().recordView,isBattle=view==='battle'||view==='local',isLocal=view==='local',selected=isBattle?view:'lessons';
  $('lessonRecordsPane').hidden=isBattle;$('battleRecordsPane').hidden=!isBattle;
- for(const el of document.querySelectorAll('[data-record-view]')){const yes=el.dataset.recordView===(isBattle?'battle':'lessons');el.classList.toggle('active',yes);el.setAttribute('aria-pressed',String(yes));}
- $('progressTitle').textContent=isBattle?'我的对战记录':'我的闯关记录';
- $('progressDescription').textContent=isBattle?'胜负自动存本机 · 闯关成绩另存，不会混在一起。':'保留最佳成绩、挑战次数、通关次数和最近练习时间。';
- const all=history(),stat=summary(all);
- $('battleRecordMetrics').innerHTML=[[stat.win,'★ 赢了'],[stat.loss,'♡ 再加油'],[stat.draw,'＝ 和棋'],[stat.total?stat.rate+'%':'—','胜率']].map(([v,t])=>'<div><b>'+v+'</b><small>'+t+'</small></div>').join('');
- $('battleRecordTotals').textContent='最近 '+stat.total+' 局：胜 '+stat.win+' · 负 '+stat.loss+' · 和 '+stat.draw+'。'+(stat.provisional?'其中 '+stat.provisional+' 局为估算，已计入上述统计。':'')+' 未结束不计入；保留最近 100 局。';
- const rows=all.filter(r=>recordFilter==='all'||recordFilter==='win'&&r.winner===r.human||recordFilter==='loss'&&r.winner!==0&&r.winner!==r.human||recordFilter==='estimate'&&r.provisional);
+ for(const el of document.querySelectorAll('[data-record-view]')){const yes=el.dataset.recordView===selected;el.classList.toggle('active',yes);el.setAttribute('aria-pressed',String(yes));}
+ $('progressTitle').textContent=isLocal?'双人对战记录':isBattle?'我的人机对战记录':'我的闯关记录';
+ $('progressDescription').textContent=isLocal?'两人同屏对战 · 分别记录黑棋、白棋的胜负和分数。':isBattle?'与电脑对战的输赢记录，与双人对局分开保存。':'保留最佳成绩、挑战次数、通关次数和最近练习时间。';
+ const all=history().filter(r=>r.mode===(isLocal?'local':'ai')),stat=summary(all);
+ const winButton=$('[data-record-filter="win"]'),lossButton=$('[data-record-filter="loss"]');
+ winButton.textContent=isLocal?'● 黑棋胜':'★ 赢了';winButton.setAttribute('data-say',isLocal?'黑棋先走':'只看获胜');
+ lossButton.textContent=isLocal?'○ 白棋胜':'♡ 再加油';lossButton.setAttribute('data-say',isLocal?'白棋后走':'只看再加油');
+ $('battleRecordMetrics').innerHTML=(isLocal?[[stat.win,'● 黑棋胜'],[stat.loss,'○ 白棋胜'],[stat.draw,'＝ 和棋'],[stat.provisional,'ⓘ 估算']]:[[stat.win,'★ 赢了'],[stat.loss,'♡ 再加油'],[stat.draw,'＝ 和棋'],[stat.total?stat.rate+'%':'—','胜率']]).map(([v,t])=>'<div><b>'+v+'</b><small>'+t+'</small></div>').join('');
+ $('battleRecordTotals').textContent='最近 '+stat.total+' 局：'+(isLocal?'黑胜 '+stat.win+' · 白胜 '+stat.loss:'胜 '+stat.win+' · 负 '+stat.loss)+' · 和 '+stat.draw+'。'+(stat.provisional?'其中 '+stat.provisional+' 局为估算，需复核。':'')+' 未结束不计入；每种模式最多保留最近 100 局。';
+ const rows=all.filter(r=>recordFilter==='all'||recordFilter==='win'&&r.winner===(isLocal?1:r.human)||recordFilter==='loss'&&r.winner!==0&&r.winner!==(isLocal?1:r.human)||recordFilter==='estimate'&&r.provisional);
  const size=window.innerHeight<600?2:window.innerHeight<760?3:5,totalPages=Math.max(1,Math.ceil(rows.length/size));recordsPage=Math.max(0,Math.min(recordsPage,totalPages-1));
  $('battleRecordList').innerHTML=rows.slice(recordsPage*size,recordsPage*size+size).map(r=>{
-  const won=r.winner===r.human,draw=r.winner===0,date=new Date(r.date),time=date.toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
-  return '<button class="battle-record-row '+(draw?'draw':won?'won':'lost')+'" data-record-id="'+esc(r.id)+'" data-say="'+recordVoice(r)+'"><span class="record-medal" aria-hidden="true">'+(draw?'＝':won?'★':'♡')+'</span><span class="record-main"><strong>'+recordOutcome(r)+(r.provisional?' <em>估算待复核</em>':'')+'</strong><small>'+esc(time)+' · '+r.n+'路 · '+labels[r.difficulty]+' · 执'+(r.human===1?'黑':'白')+' · '+r.moves+'手</small></span><span class="record-score">'+recordScore(r)+'<small>'+(r.provisional?'自动估算':r.reason==='resign'?'认输结算':r.method==='manual'?'家长复核':r.method==='auto'?'自动计分':'旧版保存')+' ◖))</small></span></button>';
+  const won=r.winner===(isLocal?1:r.human),draw=r.winner===0,date=new Date(r.date),time=date.toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}),medal=isLocal?(draw?'＝':r.winner===1?'●':'○'):(draw?'＝':won?'★':'♡');
+  const detail=isLocal?'双人对战 · '+r.moves+'手':labels[r.difficulty]+' · 执'+(r.human===1?'黑':'白')+' · '+r.moves+'手';
+  return '<button class="battle-record-row '+(draw?'draw':won?'won':'lost')+'" data-record-id="'+esc(r.id)+'" data-say="'+recordVoice(r)+'"><span class="record-medal" aria-hidden="true">'+medal+'</span><span class="record-main"><strong>'+recordOutcome(r)+(r.provisional?' <em>估算待复核</em>':'')+'</strong><small>'+esc(time)+' · '+r.n+'路 · '+detail+'</small></span><span class="record-score">'+recordScore(r)+'<small>'+(r.provisional?'自动估算':r.reason==='resign'?'认输结算':r.method==='manual'?'家长复核':r.method==='auto'?'自动计分':'旧版保存')+' ◖))</small></span></button>';
  }).join('')||'<div class="records-empty">⚔<br>还没有这类对战记录<br><small>完成一局后，胜负会自动出现在这里。</small></div>';
  $('battleRecordsPageLabel').textContent=(recordsPage+1)+' / '+totalPages+' 页';$('battleRecordsPrev').disabled=recordsPage<=0;$('battleRecordsNext').disabled=recordsPage>=totalPages-1;
  for(const el of document.querySelectorAll('[data-record-filter]'))el.classList.toggle('active',el.dataset.recordFilter===recordFilter);
