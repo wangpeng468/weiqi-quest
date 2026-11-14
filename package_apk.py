@@ -10,8 +10,8 @@ from cryptography.x509.oid import NameOID
 P=lambda *v:struct.pack('<'+'I'*len(v),*v)
 H=lambda *v:struct.pack('<'+'H'*len(v),*v)
 R=Path(__file__).parent
-PACKAGE='org.weiqi.memory';VERSION='2.9.1';VERSION_CODE=20901
-OUTPUT=R/'dist'/'围棋背谱闯关_双人音效版_v2.9.1.apk'
+PACKAGE='org.weiqi.memory';VERSION='2.9.2';VERSION_CODE=20902
+OUTPUT=R/'dist'/'围棋背谱闯关_原生音效修复版_v2.9.2.apk'
 U32=0xffffffff
 
 def chunk(t,h,p=b''):return H(t,8+len(h))+P(8+len(h)+len(p))+h+p
@@ -99,6 +99,8 @@ def icon():
 def build():
  OUTPUT.parent.mkdir(parents=True,exist_ok=True)
  if not (R/'classes.dex').exists():raise RuntimeError('Compile src with javac and D8 first; see build_native.sh')
+ for sound in ('stone','capture','correct','error','pass','undo','hint','mark','finish','toggle'):
+  if not (R/'assets/sfx'/(sound+'.wav')).is_file():raise RuntimeError('Missing offline sound: '+sound)
  mb=manifest();rb=resources();(R/'AndroidManifest.bin').write_bytes(mb);(R/'resources.arsc').write_bytes(rb)
  files={'AndroidManifest.xml':mb,'classes.dex':(R/'classes.dex').read_bytes(),'resources.arsc':rb,'res/drawable/icon.png':icon()}
  for f in sorted((R/'assets').rglob('*')):
@@ -106,12 +108,12 @@ def build():
  buf=io.BytesIO()
  with zipfile.ZipFile(buf,'w') as z:
   for name,data in files.items():
-   info=zipfile.ZipInfo(name,(2026,11,13,12,0,0));info.compress_type=zipfile.ZIP_DEFLATED if name.startswith('assets/') and not name.endswith('.mp3') else zipfile.ZIP_STORED
+   info=zipfile.ZipInfo(name,(2026,11,13,12,0,0));info.compress_type=zipfile.ZIP_DEFLATED if name.startswith('assets/') and not name.endswith(('.mp3','.wav')) else zipfile.ZIP_STORED
    if info.compress_type==zipfile.ZIP_STORED:
     at=buf.tell()+30+len(name.encode());pad=(-at)%4
     if pad:info.extra=H(0xd935,pad)+b'\0'*pad
    z.writestr(info,data,compresslevel=9)
  k,c=signing_key();b=sign_v2(buf.getvalue(),k,c);fp=verify_v2(b);OUTPUT.write_bytes(b)
- info={'package':PACKAGE,'version':VERSION,'versionCode':VERSION_CODE,'minSdk':26,'targetSdk':34,'bytes':len(b),'sha256':hashlib.sha256(b).hexdigest(),'certificateSha256':fp,'signature':'APK v2','requestedPermissions':[],'totalBuiltinLevels':548,'bundledGoGameGuruRecords':420,'voiceKeys':len(json.loads((R/'assets/voice-map.js').read_text().split('=',1)[1].strip().rstrip(';'))),'voiceModel':'matcha-icefall-zh-en','voiceSpeaker':'selected-audition-B (sid 0)','voiceSpeed':0.96,'wholeSentenceAudio':True,'orientation':'sensorLandscape','immersiveFullscreen':True,'tabletViewportLayout':True,'allPracticeControlsInRightSidebar':True,'boardHasNoToolbar':True,'runtimeNetworkRequired':False,'realAndroidTested':False,'offlineBattle':{'boards':[9,13,19],'difficulties':3,'engine':'local bounded tactical heuristic, not professional rank','undo':True,'resign':True,'automaticResults':True,'automaticDeadAnalysis':'pass-alive + bounded local capture, uncertain groups retained','uncertainResultsClearlyProvisional':True,'manualReviewAvailable':True,'recordsTabWithWinLoss':True,'resultHistoryLimit':100,'resumeWithdrawsResult':True,'komi':7.5,'recordsInNativeProgress':True},'clickLevelTitleToSpeak':True,'startupFix':{'smallHtmlBytes':len(files['assets/index.html']),'audioFiles':len(list((R/'assets/audio').glob('*.mp3'))),'audioReadOnDemand':True,'audioStoredUncompressed':True,'javascriptTarget':'ES5','nativeCompiler':'Unchanged validated v2.7.0 DEX (javac 21 --release 8 + D8 9.4.34)','sameWebOriginAsPrevious':True,'nativeLoadingAndRecoveryPage':True,'nativeMediaPlayer':True}}
+ info={'package':PACKAGE,'version':VERSION,'versionCode':VERSION_CODE,'minSdk':26,'targetSdk':34,'bytes':len(b),'sha256':hashlib.sha256(b).hexdigest(),'certificateSha256':fp,'signature':'APK v2','requestedPermissions':[],'totalBuiltinLevels':548,'bundledGoGameGuruRecords':420,'voiceKeys':len(json.loads((R/'assets/voice-map.js').read_text().split('=',1)[1].strip().rstrip(';'))),'voiceModel':'matcha-icefall-zh-en','voiceSpeaker':'selected-audition-B (sid 0)','voiceSpeed':0.96,'wholeSentenceAudio':True,'orientation':'sensorLandscape','immersiveFullscreen':True,'tabletViewportLayout':True,'allPracticeControlsInRightSidebar':True,'boardHasNoToolbar':True,'runtimeNetworkRequired':False,'realAndroidTested':False,'offlineBattle':{'boards':[9,13,19],'difficulties':3,'engine':'local bounded tactical heuristic, not professional rank','undo':True,'resign':True,'automaticResults':True,'automaticDeadAnalysis':'pass-alive + bounded local capture, uncertain groups retained','uncertainResultsClearlyProvisional':True,'manualReviewAvailable':True,'recordsTabWithWinLoss':True,'resultHistoryLimit':100,'resumeWithdrawsResult':True,'komi':7.5,'recordsInNativeProgress':True},'clickLevelTitleToSpeak':True,'startupFix':{'smallHtmlBytes':len(files['assets/index.html']),'audioFiles':len(list((R/'assets/audio').glob('*.mp3'))),'audioReadOnDemand':True,'audioStoredUncompressed':True,'javascriptTarget':'ES5','nativeCompiler':'Native Java rebuilt with javac --release 8 and Android D8','sameWebOriginAsPrevious':True,'nativeLoadingAndRecoveryPage':True,'nativeMediaPlayer':True}}
  (R/'build-info.json').write_text(json.dumps(info,ensure_ascii=False,indent=2));print(json.dumps(info,ensure_ascii=False,indent=2))
 if __name__=='__main__':build()
