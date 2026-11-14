@@ -86,7 +86,7 @@
  function setEnabled(next){
   enabled=!!next;
   try{localStorage.setItem(KEY,enabled?'on':'off');}catch(e){}
-  if(master&&ctx)master.gain.setValueAtTime(enabled?.32:0,ctx.currentTime);
+  if(master&&ctx)master.gain.setValueAtTime(enabled ? 0.32 : 0,ctx.currentTime);
   update();
   if(enabled)play('toggle');
  }
