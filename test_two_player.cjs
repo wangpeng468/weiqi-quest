@@ -6,10 +6,11 @@ const vm = require('node:vm');
 const E = require('./web-src/battle-engine.js');
 const html = fs.readFileSync('assets/index.html', 'utf8');
 const src = fs.readFileSync('web-src/battle.js', 'utf8');
+const compiled = fs.readFileSync('assets/battle.js', 'utf8');
 for (const id of [...new Set([...src.matchAll(/\$\('([^']+)'\)/g)].map(m => m[1]))]) {
   assert(html.includes('id="' + id + '"'), 'Missing HTML element: ' + id);
 }
-function createHarness(originalState) {
+function createHarness(originalState, script = src) {
   const nodes = Object.create(null), attrs = [];
   function el(id, attr = {}) {
     return {
@@ -33,7 +34,7 @@ function createHarness(originalState) {
   const window = {BattleEngine:E,innerHeight:800,addEventListener(){}};
   const spoken=[];
   const voice={say:key=>spoken.push(key)};
-  vm.runInNewContext(src,{window,document,ButtonVoice:voice,console,setTimeout,clearTimeout,Date,Math}, {filename:'web-src/battle.js'});
+  vm.runInNewContext(script,{window,document,ButtonVoice:voice,console,setTimeout,clearTimeout,Date,Math}, {filename:'battle.js'});
   const state=originalState||{version:2,battle:null,battleHistory:[],battleVoids:[],recordView:'lessons'};
   const host={getState:()=>state,save(){},download(){},layout(){},toast(){},showTab(tab){document.body.dataset.page=tab;}};
   window.GoBattle.init(host);
@@ -99,6 +100,13 @@ async function run(){
   recovered.battle.importProgress({battleHistory:legacy,battleVoids:[]});
   assert.equal(recovered.state.battleHistory.length,2,'old and local backup history merge');
   assert.equal(JSON.stringify(backup.battleHistory),before,'backup stays untouched');
+  const apkBundle=createHarness(null,compiled);
+  apkBundle.battle.enter();apkBundle.battle.newGame(9,1,0,'local');
+  assert.equal(apkBundle.battle.mode,'local','ES5 APK assets support local play');
+  assert.equal(apkBundle.battle.play(20),true);
+  assert.equal(apkBundle.battle.play(30),true);
+  assert.match(apkBundle.nodes.battleLiveScore.textContent,/临时计分/);
+  apkBundle.battle.leave();
   b.leave();recovered.battle.leave();
   console.log('PASS local 2-player: setup, alternating turns, live tally, single undo, double pass, scoring, records, save/restore, resign, legacy backup');
 }
