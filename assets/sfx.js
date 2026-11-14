@@ -9,6 +9,8 @@
     var icon = document.getElementById('soundIcon');
     var label = document.getElementById('soundLabel');
     var enabled = true, ctx = null, master = null, noise = null, lastType = '', lastTime = 0;
+    var nativeBridge = root.GoAndroid;
+    var nativeSound = !!(nativeBridge && typeof nativeBridge.playSound === 'function');
     try {
         enabled = localStorage.getItem(KEY) !== 'off';
     }
@@ -82,6 +84,16 @@
         var now = Date.now();
         if (type === lastType && now - lastTime < 65)
             return false;
+        if (nativeSound) {
+            try {
+                if (nativeBridge.playSound(type)) {
+                    lastType = type;
+                    lastTime = now;
+                    return true;
+                }
+            }
+            catch (e) { /* Use Web Audio if this WebView bridge is unavailable. */ }
+        }
         var a = context();
         if (!a)
             return false;
@@ -146,6 +158,12 @@
             localStorage.setItem(KEY, enabled ? 'on' : 'off');
         }
         catch (e) { }
+        if (nativeSound && typeof nativeBridge.setSoundEnabled === 'function') {
+            try {
+                nativeBridge.setSoundEnabled(enabled);
+            }
+            catch (e) { }
+        }
         if (master && ctx)
             master.gain.setValueAtTime(enabled ? 0.32 : 0, ctx.currentTime);
         update();
@@ -162,9 +180,22 @@
         }
     });
     update();
+    if (nativeSound && typeof nativeBridge.setSoundEnabled === 'function') {
+        try {
+            nativeBridge.setSoundEnabled(enabled);
+        }
+        catch (e) { }
+    }
     root.SoundFX = {
         play: play, setEnabled: setEnabled,
         get enabled() { return enabled; },
-        get supported() { return !!(root.AudioContext || root.webkitAudioContext); }
+        get supported() { return nativeSound || !!(root.AudioContext || root.webkitAudioContext); },
+        get engine() { return nativeSound ? 'android' : (root.AudioContext || root.webkitAudioContext) ? 'web' : 'unavailable'; },
+        diagnostics: function () { try {
+            return nativeSound && nativeBridge.soundDiagnostics ? nativeBridge.soundDiagnostics() : 'Web Audio fallback';
+        }
+        catch (e) {
+            return 'Sound diagnostic unavailable';
+        } }
     };
 })(window);
