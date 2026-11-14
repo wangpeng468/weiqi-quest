@@ -10,7 +10,7 @@ const battle=fs.readFileSync('web-src/battle.js','utf8');
 assert.match(html,/id="voiceToggle"[\s\S]*id="soundToggle"/);
 assert.match(html,/<script src="sfx\.js"><\/script>/);
 assert.match(practice,/fx\('finish'\)/);
-assert.match(practice,/fx\('correct'\)/);
+assert.match(practice,/fx\(p<0\?'pass':'correct'\)/);
 assert.match(battle,/fx\('capture'/);
 assert.match(battle,/fx\('undo'\)/);
 
