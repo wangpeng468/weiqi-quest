@@ -1,0 +1,17 @@
+
+typedef struct {const char *model,*lexicon,*tokens,*data_dir;float noise_scale,noise_scale_w,length_scale;const char *dict_dir;} Vits;
+typedef struct {const char *acoustic_model,*vocoder,*lexicon,*tokens,*data_dir;float noise_scale,length_scale;const char *dict_dir;} Matcha;
+typedef struct {const char *model,*voices,*tokens,*data_dir;float length_scale;const char *dict_dir,*lexicon,*lang;} Kokoro;
+typedef struct {const char *model,*voices,*tokens,*data_dir;float length_scale;const char *lexicon;} Kitten;
+typedef struct {const char *tokens,*encoder,*decoder,*vocoder,*data_dir,*lexicon;float feat_scale,t_shift,target_rms,guidance_scale;} Zipvoice;
+typedef struct {const char *lm_flow,*lm_main,*encoder,*decoder,*text_conditioner,*vocab_json,*token_scores_json;int32_t voice_embedding_cache_capacity;} Pocket;
+typedef struct {const char *duration_predictor,*text_encoder,*vector_estimator,*vocoder,*tts_json,*unicode_indexer,*voice_style;} Supertonic;
+typedef struct {Vits vits;int32_t num_threads,debug;const char *provider;Matcha matcha;Kokoro kokoro;Kitten kitten;Zipvoice zipvoice;Pocket pocket;Supertonic supertonic;} Model;
+typedef struct {Model model;const char *rule_fsts;int32_t max_num_sentences;const char *rule_fars;float silence_scale;} Config;
+typedef struct {const float *samples;int32_t n,sample_rate;} Audio;
+typedef struct SherpaOnnxOfflineTts SherpaOnnxOfflineTts;
+const SherpaOnnxOfflineTts *SherpaOnnxCreateOfflineTts(const Config *);
+void SherpaOnnxDestroyOfflineTts(const SherpaOnnxOfflineTts *);
+const Audio *SherpaOnnxOfflineTtsGenerate(const SherpaOnnxOfflineTts *,const char *,int32_t,float);
+void SherpaOnnxDestroyOfflineTtsGeneratedAudio(const Audio *);
+int32_t SherpaOnnxOfflineTtsNumSpeakers(const SherpaOnnxOfflineTts *);

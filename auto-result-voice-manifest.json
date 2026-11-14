@@ -1,0 +1,203 @@
+[
+  {
+    "key": "我的练习记录",
+    "text": "看看我的练习记录。这里有闯关成绩，还有对战的输赢。",
+    "id": "6b986fd6b5e670f457e31d1dae7566ea8b1019a6ba479c8c47b114d507a432aa",
+    "model": "matcha-icefall-zh-en",
+    "speed": 0.96,
+    "sid": 0,
+    "sha256": "6ef45e305bfcdf65477f935bd058b527337b929da89d18960911709ed4df22e8"
+  },
+  {
+    "key": "自动判胜负",
+    "text": "下完了吗？点这里，自动算一算谁赢了。",
+    "id": "d0a60452b22a10b34ac302088ffa4c7d2d13f6c62a7b3963afbed1921980dd6b",
+    "model": "matcha-icefall-zh-en",
+    "speed": 0.96,
+    "sid": 0,
+    "sha256": "f3ede136323df69e8801fffd6484391253e8e21ae72ba9a862f5b26caa614ab3"
+  },
+  {
+    "key": "自动判胜负中",
+    "text": "正在算分，马上就知道结果啦。",
+    "id": "de38c7409f5c0a9664b4845a2bf3c85f058f09f98bf9539b4e306fc5516f797f",
+    "model": "matcha-icefall-zh-en",
+    "speed": 0.96,
+    "sid": 0,
+    "sha256": "066b7b72ba87894bd6725b29cffa09c0a5f579e310cd49b8633059fd14115f93"
+  },
+  {
+    "key": "自动判分确认",
+    "text": "要按现在的棋盘算输赢吗？还没有下完，可以返回继续下。",
+    "id": "5c556c8ab47785629f67743aab5e7926ea2f83bb7f4f2eb0ea342de76a014ead",
+    "model": "matcha-icefall-zh-en",
+    "speed": 0.96,
+    "sid": 0,
+    "sha256": "644bb1672aa8a6a62ec0c8ce213d73397a4f7a6720abd1d37689376f2d50c2ff"
+  },
+  {
+    "key": "确认自动判分",
+    "text": "现在开始算分。",
+    "id": "f5e7925e62ca6a54022e67596b74aecf3afa5418adbca76a4f6d9fae89a8c89a",
+    "model": "matcha-icefall-zh-en",
+    "speed": 0.96,
+    "sid": 0,
+    "sha256": "6e33277398963b2c4127094bac5fff25a079be121c12bb7d736d73389aa2068c"
+  },
+  {
+    "key": "自动判分失败",
+    "text": "这盘棋还需要检查一下，可以继续下，也可以请家长帮忙。",
+    "id": "1213fba3fa5fb19fde9396fd851025227ace7152de5ed977c27f90fa6f2d94f5",
+    "model": "matcha-icefall-zh-en",
+    "speed": 0.96,
+    "sid": 0,
+    "sha256": "d618ca88cea82cbc7ec76a5ee146c4eac083becf5ac01acd2e7a7a2d368f37e2"
+  },
+  {
+    "key": "估算你赢了",
+    "text": "按现在的棋盘估算，你赢啦！结果已保存，不确定的地方可以请家长检查。",
+    "id": "f89643e2bb22ec4ae7fa68781328ad94a5cd5b68970205395d38989d013b164b",
+    "model": "matcha-icefall-zh-en",
+    "speed": 0.96,
+    "sid": 0,
+    "sha256": "63c16eab010a629a45b2e77a00663d3665f69961cf34df9b3d11088f920a8b99"
+  },
+  {
+    "key": "估算电脑赢了",
+    "text": "按现在的棋盘估算，电脑赢了。再练一局吧！不确定的地方可以请家长检查。",
+    "id": "c5ff65aec6bd95c723b01d1528e5fd1b8efec37400abb2b3c4a32806f6e617b2",
+    "model": "matcha-icefall-zh-en",
+    "speed": 0.96,
+    "sid": 0,
+    "sha256": "c13c280f6267a3e24e9a60847746a894c9ecfb15e9f07dd71e3bc70edccc082f"
+  },
+  {
+    "key": "估算和棋",
+    "text": "按现在的棋盘估算，这局是和棋。请家长检查一下。",
+    "id": "51ad612494cf2d04b3c242aec5aded28148fd0d4cf1fc5f93fcf44b34b0eb837",
+    "model": "matcha-icefall-zh-en",
+    "speed": 0.96,
+    "sid": 0,
+    "sha256": "acd0433d4a0f1c7743ca4c970c4f56b54976fe4259750e7a12756117ec5edc92"
+  },
+  {
+    "key": "对战和棋",
+    "text": "你们的分数一样，这一局是和棋！",
+    "id": "36ebce599a07e87bf5071f28fb0d2f588d6707ae270902e5808eae66369efdd8",
+    "model": "matcha-icefall-zh-en",
+    "speed": 0.96,
+    "sid": 0,
+    "sha256": "0e817ebdea77ae45545e1ed9f61656f5bbf0edc139305b271ee63f0690d76b56"
+  },
+  {
+    "key": "查看输赢记录",
+    "text": "看看对战的输赢记录。点一局，还能听到结果。",
+    "id": "d68e909b2988dc84036740f504f290299218025ef534a4e992fe917393bc8ab7",
+    "model": "matcha-icefall-zh-en",
+    "speed": 0.96,
+    "sid": 0,
+    "sha256": "9086dbaa2f2dc01194f6a7d291785c1652e450c9010aca924cd33af9c714a5e9"
+  },
+  {
+    "key": "家长复核",
+    "text": "请家长帮忙检查死棋，再确认分数。",
+    "id": "b54d97ac2059a247fab29614d4748e777a5d66bcf80b07736a946efeb6f34b0d",
+    "model": "matcha-icefall-zh-en",
+    "speed": 0.96,
+    "sid": 0,
+    "sha256": "c260bebe9d16faece956d000cd96e97050626bce252ff67899582bb67d82a388"
+  },
+  {
+    "key": "继续本局",
+    "text": "继续下这一盘棋。重新结束时，会再算一次输赢。",
+    "id": "83320055fc2fbf778f01a0c93f29b77ab10f887b3f43b2130f198e2c55ba9ced",
+    "model": "matcha-icefall-zh-en",
+    "speed": 0.96,
+    "sid": 0,
+    "sha256": "9b2a583aa5be7ce14f3b2946c3a9c597c884c7aa4dbc94768e43514dcb1ff822"
+  },
+  {
+    "key": "撤回结算说明",
+    "text": "继续下棋后，会撤回这局的输赢记录。下完了，再重新算分。",
+    "id": "9df375202d97f15a04fdc01f6b0ecc1bd2ac631c441a8575e4ee7ed3ca376300",
+    "model": "matcha-icefall-zh-en",
+    "speed": 0.96,
+    "sid": 0,
+    "sha256": "deee2cce85027ce583b0bb985fdd3349f5779d094ac3469ff3ec983714b3bdca"
+  },
+  {
+    "key": "全部对战",
+    "text": "这里是最近完成的全部对战。",
+    "id": "4d402270bbedfb78cbdba8a4a319745e19167f735bea1fd3ac747bd738f5b304",
+    "model": "matcha-icefall-zh-en",
+    "speed": 0.96,
+    "sid": 0,
+    "sha256": "c80c4bc490cb474f9ac83d2a630dc463a93de34d6fc5f9bd896e4d910652de07"
+  },
+  {
+    "key": "只看获胜",
+    "text": "看看自己赢下的对局。",
+    "id": "6f61466dfcfa330485e1b21edfec8600232550622047cc90c11803c31473681b",
+    "model": "matcha-icefall-zh-en",
+    "speed": 0.96,
+    "sid": 0,
+    "sha256": "ee4280b495f4f1d82614a295a34d25def3515857e30c1aab04f15b6da56e17a1"
+  },
+  {
+    "key": "只看再加油",
+    "text": "看看还可以进步的对局，下次继续加油！",
+    "id": "49bfc66b3e1a112bc513966e48d7dc654a6e315ce0976d7126f0ed2509942396",
+    "model": "matcha-icefall-zh-en",
+    "speed": 0.96,
+    "sid": 0,
+    "sha256": "afe8036c7d351d0274105f32fb1c08b77144a629c33d64f760d1ee1662741cde"
+  },
+  {
+    "key": "查看估算记录",
+    "text": "这些对局的分数是估算结果，可以请家长帮忙检查。",
+    "id": "828d2f403a68aa4c5ec7fbc100102860713bdce2b64fc69318a194380ce906a0",
+    "model": "matcha-icefall-zh-en",
+    "speed": 0.96,
+    "sid": 0,
+    "sha256": "73057a85fd9a7280290cbf2c8ab83497e271c9fc0fbe2576bd526c0f8d0ea6ed"
+  },
+  {
+    "key": "记录你赢了",
+    "text": "这一局，你赢了！真棒！",
+    "id": "8f20755862feb5a1add53be6e438b854b96bf12bde04143a97736baa57c7faa4",
+    "model": "matcha-icefall-zh-en",
+    "speed": 0.96,
+    "sid": 0,
+    "sha256": "f9d7685e48c98f71723d6e4cb7fc73e11c0b1e9a5adda2fe0d53649cda48cc8a"
+  },
+  {
+    "key": "记录电脑赢了",
+    "text": "这一局，电脑赢了。继续练习，你会越来越棒！",
+    "id": "c286989bf6f9ac60adf0672b9642317c7efede38aebdacfaa830b5fadc0788c5",
+    "model": "matcha-icefall-zh-en",
+    "speed": 0.96,
+    "sid": 0,
+    "sha256": "797caacfb2d43a1a808bcc2ff7a4ecaafdb0039135d4acae7c3ecf47cdd92980"
+  },
+  {
+    "key": "记录和棋",
+    "text": "这一局，双方分数一样，是和棋。",
+    "id": "ea60c6e5f7d0dcb7d9400f05564368af055813cdc6f5a7605a9ff3781df81d51",
+    "model": "matcha-icefall-zh-en",
+    "speed": 0.96,
+    "sid": 0,
+    "sha256": "751e3277b69efa1afc0079534b834a9b231c74e9d30630ea5fe1215145cfb1ea"
+  },
+  {
+    "key": "返回记录",
+    "text": "返回对战记录。",
+    "id": "a36da6f99abb8d5f1241dac6d88fff16d617af1b6e770ee63225ff182b1eb4e9",
+    "model": "matcha-icefall-zh-en",
+    "speed": 0.96,
+    "sid": 0,
+    "sha256": "32d7600a57acf101cbdce9420fb66cad11dbbb4dc1a92afcad12429aeba5a3a6",
+    "seconds": 1.368,
+    "peak": 0.6932260394096375,
+    "sourceRate": 16000
+  }
+]

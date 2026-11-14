@@ -1,0 +1,11 @@
+{
+  "name": "weiqi-memory-offline",
+  "private": true,
+  "version": "2.8.0",
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  },
+  "scripts": {
+    "web": "node transpile.cjs"
+  }
+}

@@ -1,0 +1,71 @@
+{
+  "tests": [
+    "single capture and occupancy",
+    "multiple-group capture",
+    "suicide prohibited; capturing through surrounded move legal",
+    "ko / positional superko",
+    "two passes and pair undo",
+    "undo pending computer response and human white",
+    "area counts live stones, territory and neutral points",
+    "record replay / validation",
+    "tactical opponents capture an atari",
+    "all three levels produce only legal moves on 9/13/19 boards"
+  ],
+  "runs": [
+    {
+      "n": 9,
+      "d": 0,
+      "plies": 82,
+      "maxMs": 6
+    },
+    {
+      "n": 9,
+      "d": 1,
+      "plies": 83,
+      "maxMs": 1
+    },
+    {
+      "n": 9,
+      "d": 2,
+      "plies": 79,
+      "maxMs": 15
+    },
+    {
+      "n": 13,
+      "d": 0,
+      "plies": 50,
+      "maxMs": 5
+    },
+    {
+      "n": 13,
+      "d": 1,
+      "plies": 50,
+      "maxMs": 1
+    },
+    {
+      "n": 13,
+      "d": 2,
+      "plies": 50,
+      "maxMs": 26
+    },
+    {
+      "n": 19,
+      "d": 0,
+      "plies": 30,
+      "maxMs": 7
+    },
+    {
+      "n": 19,
+      "d": 1,
+      "plies": 30,
+      "maxMs": 4
+    },
+    {
+      "n": 19,
+      "d": 2,
+      "plies": 30,
+      "maxMs": 36
+    }
+  ],
+  "passed": true
+}

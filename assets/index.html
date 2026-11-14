@@ -1,0 +1,106 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self' data:; connect-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'"><meta name="color-scheme" content="light"><meta name="theme-color" content="#205c49"><script src="boot.js"></script><link rel="stylesheet" href="app.css"><title>围棋背谱闯关 · 离线语音版</title></head>
+<body class="tablet-landscape" data-page="practice">
+
+<div id="storageWarning" class="banner warning" hidden></div>
+<main>
+<section id="practice" class="page" aria-label="棋盘练习">
+ <div class="practice-grid">
+  <div class="board-panel card">
+   <div class="board-stage"><div id="boardWrap"><svg id="board" role="img" aria-label="围棋棋盘，点击交叉点落子" viewBox="0 0 600 600"></svg></div></div>
+  </div>
+  <aside class="lesson-card card">
+<header id="appHeader" class="topbar">
+ <div class="brand"><span class="logo" aria-hidden="true"><i></i><b></b></span><div><strong>围棋背谱闯关</strong><small>548 关 · 全离线</small><span id="saveState" class="save-state">检查本地保存…</span></div></div>
+ <nav class="tabs" aria-label="主要页面"><button data-tab="practice" class="active" data-say="棋盘练习"><span aria-hidden="true">♟</span> 棋盘</button><button data-tab="battle" data-say="对战练习"><span aria-hidden="true">⚔</span> 对战</button><button data-tab="levels" data-say="选择关卡"><span aria-hidden="true">▦</span> 选关</button><button data-tab="progress" data-say="我的练习记录"><span aria-hidden="true">★</span> 记录</button><button data-tab="library" data-say="棋谱与备份"><span aria-hidden="true">▣</span> 备份</button></nav>
+ <div class="top-right"><button id="voiceToggle" class="voice-toggle" type="button" aria-label="关闭按钮语音" aria-pressed="true" title="点击关闭按钮语音"><span id="voiceIcon" aria-hidden="true">🔊</span><small id="voiceLabel">语音开</small></button></div>
+</header>
+   <div class="practice-heading"><div class="lesson-title read-title" id="readLevelName" role="button" tabindex="0" data-read-name="true" aria-label="朗读当前关卡名称"><div id="currentCategory" class="eyebrow">启蒙练习</div><h1 class="read-title-line"><span id="levelTitle">准备棋盘…</span><svg class="title-speaker" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9h4l5-4v14l-5-4H3z" fill="currentColor"/><path d="M16 8q4 4 0 8m3-11q7 7 0 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></h1><p id="levelSubtitle" class="muted"></p></div><button id="lessonHelp" class="help-button secondary" aria-label="本关提示" data-say="本关提示">ⓘ</button></div>
+   <div class="board-toolbar"><span id="modeLabel" class="pill">① 先看棋谱</span><span id="moveLabel">0 / 0 手</span><button id="zoomButton" class="small text-button" aria-pressed="true">局部放大</button></div>
+   <div id="feedback" role="status" aria-live="polite" class="feedback">点“下一手”观察棋谱，再开始背。</div>
+   <div class="lesson-actions">
+    <div id="previewControls"><input id="moveSlider" aria-label="看谱进度" type="range" min="0" max="1" value="0"><div class="playback"><button id="rewind" class="secondary" title="回到本关起点">↶ 起点</button><button id="prevMove" class="secondary">◀ 上一手</button><button id="nextMove" class="secondary">下一手 ▶</button><button id="autoPlay" class="secondary">▶ 自动</button></div><button id="startTraining" class="primary wide" data-say="开始背谱"><span aria-hidden="true">● ○</span> 开始背谱</button><p class="action-caption">看完棋谱，再遮住答案自己摆。</p></div>
+    <div id="trainingControls" hidden><div class="metrics small-metrics"><div><b id="stepMetric">0</b><small>已摆对</small></div><div><b id="errorMetric">0</b><small>错手</small></div><div><b id="hintMetric">0</b><small>提示</small></div></div><div class="two-buttons"><button id="hint" class="secondary">💡 看一手提示</button><button id="pass" class="secondary">停一手</button></div><div class="two-buttons"><button id="restart" class="text-button">重新挑战</button><button id="review" class="text-button" data-say="重看棋谱">重看棋谱</button></div></div>
+    <div id="completeControls" hidden class="complete-box"><div id="stars" class="stars">★★★</div><h2>这一关完成了！</h2><p id="resultText"></p><button id="nextLevel" class="primary wide">继续下一关 →</button><div class="two-buttons"><button id="retry" class="secondary">再练一遍</button><button id="completeMap" class="secondary">回到选关</button></div></div>
+   </div>
+   <div class="board-foot"><span id="turnLabel">看一遍，再自己摆</span><label><input id="showNumbers" type="checkbox" checked>手数</label></div>
+   <div class="side-bottom"><p id="bestResult" class="practice-best muted"></p><div class="level-switch" aria-label="关卡切换"><button id="previousLevel" class="secondary" data-say="上一关"><span aria-hidden="true">◀</span><span>上一关</span></button><button id="chooseLevel" class="secondary" data-say="选关"><span aria-hidden="true">▦</span><span>选关</span></button><button id="forwardLevel" class="secondary" data-say="下一关"><span aria-hidden="true">▶</span><span>下一关</span></button></div></div>
+  </aside>
+ </div>
+</section>
+<section id="battle" class="page" hidden aria-label="离线围棋对战">
+ <div class="practice-grid battle-grid">
+  <div class="board-panel card"><div class="board-stage"><div id="battleBoardWrap"><svg id="battleBoard" viewBox="0 0 600 600" role="img" aria-label="对战棋盘，点击交叉点落子"></svg></div></div></div>
+  <aside class="lesson-card battle-card card">
+   <div class="battle-heading"><div><h1>和电脑下围棋</h1><p id="battleSummary" class="muted">9 路 · 你执黑棋</p></div><button id="battleHelp" class="secondary help-button" data-say="对战玩法">ⓘ</button></div>
+   <div class="battle-difficulty" role="group" aria-label="选择电脑难度"><button data-difficulty="0" data-say="对战轻松"><span>★</span> 轻松</button><button data-difficulty="1" data-say="对战认真"><span>★★</span> 认真</button><button data-difficulty="2" data-say="对战挑战"><span>★★★</span> 挑战</button></div>
+   <button id="battleStatus" class="battle-status" data-say="轮到你了"><span id="battleStatusIcon" aria-hidden="true">●</span><span id="battleStatusText">轮到你了</span><span aria-hidden="true" class="status-speaker">◖))</span></button>
+   <div class="battle-metrics"><span id="battleMoveCount">第 1 手</span><span id="battleCaptures">提子 ● 0 / ○ 0</span></div>
+   <div id="battlePlay" class="battle-play">
+    <div class="battle-spacer"><p id="battleTip">你执黑棋，点棋盘交叉点就能落子。</p><p class="battle-tip-small">选一个难度，随时可以改变。</p></div>
+    <div class="battle-actions">
+     <button id="battleUndo" class="secondary" data-say="对战悔棋"><span aria-hidden="true">↶</span><b>悔棋</b></button>
+     <button id="battleHint" class="secondary" data-say="对战提示"><span aria-hidden="true">💡</span><b>提示</b></button>
+     <button id="battlePass" class="secondary" data-say="对战停一手"><span aria-hidden="true">✋</span><b>停一手</b></button>
+     <button id="battleScore" class="secondary" data-say="自动判胜负"><span aria-hidden="true">▦</span><b>判胜负</b></button>
+     <button id="battleResign" class="secondary" data-say="对战认输"><span aria-hidden="true">⚑</span><b>认输</b></button>
+     <button id="battleNew" class="primary" data-say="新开一局"><span aria-hidden="true">＋</span><b>新一局</b></button>
+    </div>
+   </div>
+   <div id="battleJudging" class="battle-judging" hidden><div class="spinner"></div><p>正在本机算分…<br><small>不用联网，不影响闯关记录。</small></p></div>
+   <div id="battleScoring" class="battle-scoring" hidden><p>点整块死棋标记 ×；再点一次可取消。请家长一起检查。</p><div id="battleScorePreview" class="score-preview"></div><p class="muted tiny">家长复核：点棋块标记死子，再确认。按面积计分，白贴 7.5。</p><div class="two-buttons"><button id="battleResume" class="secondary" data-say="对战继续下棋">▶ 继续下</button><button id="battleFinish" class="primary" data-say="对战确认结果">✓ 确认结果</button></div></div>
+   <div id="battleResult" class="battle-result" hidden><div id="battleResultIcon" class="result-icon">★</div><button id="battleResultTitle" class="result-title text-button" data-say="对战赢了"></button><p id="battleResultDetails"></p><p id="battleResultCaution" class="result-caution"></p><div class="two-buttons"><button id="battleAgain" class="primary" data-say="再下一局">＋ 再下一局</button><button id="battleOpenRecords" class="secondary" data-say="查看输赢记录">★ 看战绩</button></div><div class="two-buttons"><button id="battleContinueAfter" class="secondary" data-say="继续本局">▶ 继续下</button><button id="battleCorrect" class="secondary" data-say="家长复核">ⓘ 家长复核</button></div><button id="battleReview" class="text-button" data-say="看看这盘棋">▦ 看看这盘棋</button></div>
+   <div class="battle-bottom"><span id="battleRecord">对局自动存本机</span><button id="battleHistory" class="text-button" data-say="对战记录">★ 战绩</button></div>
+  </aside>
+ </div>
+</section>
+<section id="levels" class="page" hidden>
+ <div class="section-heading"><div><div class="eyebrow">按自己的节奏前进</div><h1>选一关，开始练</h1><p class="muted">所有关卡都能直接选择，不需要先解锁。</p></div><button id="continueLast" class="primary">继续上次练习</button></div>
+ <div class="catalog-summary card"><b id="catalogCount">548 个关卡入口</b><span id="offlineCount">548 关已内置</span><span>自由选关 · 已过关卡可以反复练</span></div>
+ <div class="filters"><label>棋谱分类<select id="categoryFilter"><option value="all">全部分类</option></select></label><label>练习状态<select id="statusFilter"><option value="all">全部状态</option><option value="offline">已离线可用</option><option value="new">还没有通关</option><option value="passed">已通关，可重练</option><option value="review">已过但未获三星</option></select></label><label class="search-label">搜索<input id="searchLevels" type="search" placeholder="输入标题、编号或手数"></label></div>
+ <div class="list-heading"><p id="filterCount" class="muted"></p><button id="randomReview" class="text-button">随机复习已通关关卡</button></div>
+ <div id="levelGrid" class="level-grid"></div><div class="pagination"><button id="pagePrev" class="secondary">上一页</button><span id="pageLabel"></span><button id="pageNext" class="secondary">下一页</button></div>
+</section>
+<section id="progress" class="page" hidden>
+ <div class="section-heading"><div><div class="eyebrow">每一小步，都有记录</div><h1 id="progressTitle">我的闯关记录</h1><p id="progressDescription" class="muted">保留最佳成绩、挑战次数、通关次数和最近练习时间。</p></div><button id="backupTop" class="primary">备份记录</button></div>
+ <div class="record-tabs" role="group" aria-label="切换记录类别"><button data-record-view="lessons" class="active" data-say="闯关记录">★ 闯关记录</button><button data-record-view="battle" data-say="查看输赢记录">⚔ 对战输赢</button></div>
+ <div id="lessonRecordsPane">
+ <div id="progressMetrics" class="metrics large-metrics"></div><div class="progress-columns"><div class="card progress-card"><h2>各类关卡进度</h2><div id="groupProgress"></div></div><div class="card progress-card"><h2>最近练习</h2><div id="recentList"></div></div>
+ </div><p class="under-note">完成所有手顺即可通关；三星表示本次没有错手、没有提示。重练不会降低已有最佳成绩。</p>
+ </div>
+ <div id="battleRecordsPane" hidden>
+  <div id="battleRecordMetrics" class="metrics battle-record-metrics"></div>
+  <div class="record-toolbar"><div class="record-filters"><button data-record-filter="all" class="active" data-say="全部对战">全部</button><button data-record-filter="win" data-say="只看获胜">★ 赢了</button><button data-record-filter="loss" data-say="只看再加油">♡ 再加油</button><button data-record-filter="estimate" data-say="查看估算记录">ⓘ 估算</button></div><button id="battleRecordsPlay" class="primary" data-say="再下一局">⚔ 去下棋</button></div>
+  <div id="battleRecordList" class="battle-record-list"></div>
+  <div class="pagination record-pagination"><button id="battleRecordsPrev" class="secondary" data-say="上一页">◀ 上一页</button><span id="battleRecordsPageLabel"></span><button id="battleRecordsNext" class="secondary" data-say="下一页">下一页 ▶</button></div>
+  <p id="battleRecordTotals" class="record-totals"></p>
+ </div>
+</section>
+<section id="library" class="page" hidden>
+ <div class="section-heading"><div><div class="eyebrow">装好棋谱，再安心离线练</div><h1>棋谱库与本地备份</h1><p class="muted">548 关全部内置，棋谱、闯关和按钮语音均不依赖网络。</p></div></div>
+ <div class="library-grid">
+ <div class="card library-card"><h2>全部棋谱已装好</h2><p class="offline-count">548 关，全离线</p><p>96 关启蒙方向练习、420 题公开题库、32 关名局分段，全部随安装包提供。第一次打开也不需要联网或下载。</p><p class="subtle">原题库初级、中级、高级各 140 题；“初级”不等于零基础。孩子可以先从启蒙关开始。</p><p>右上角 <b>🔊 / 🔇</b> 控制按钮语音。中文声音已内置，不需要联网或安装语音包。关闭会立即停止播放，开关状态自动保存。</p><p id="cacheStatus" class="subtle"></p><p class="subtle">内置已选定的 B 音色（Matcha）中文整句配音，沿用试听语速；声音仍为合成配音，不是真人录音。使用平板媒体音量调节。导入的新棋谱名称会读“打开棋谱”。</p></div>
+ <div class="card library-card"><h2>导入老师的 SGF 棋谱</h2><p>可一次选择多个 SGF 文件；长棋谱自动分成每关 10 手。支持初始摆子、提子、停一手；变化谱只取第一条主线。</p><label class="file-button secondary">选择棋谱文件<input id="sgfFiles" type="file" accept=".sgf,application/x-go-sgf" multiple></label><details><summary>也可以粘贴棋谱文本</summary><textarea id="sgfText" rows="5" placeholder="(;GM[1]SZ[9];B[cc];W[gg])"></textarea><input id="sgfTitle" type="text" placeholder="棋谱名称（可选）" maxlength="100"><button id="importText" class="secondary">导入这段棋谱</button></details><p id="importStatus" class="subtle" role="status"></p><p class="subtle">导入和判分都在本机完成，不上传棋谱。暂不支持照片识别、矩形棋盘及对局中途改摆棋子的文件。</p></div>
+ <div class="card library-card"><h2>备份、恢复与离线整合</h2><p><strong>闯关记录、未完成对战及最近对战结果自动存于本应用的本机空间。</strong>卸载应用、清除应用数据会删除记录；更换设备前请导出 JSON 备份。旧 HTML 的记录可导出 JSON 后在这里恢复。重要进度请另存备份。</p><button id="exportBackup" class="primary wide">导出备份（含记录与已存棋谱）</button><label class="file-button secondary wide">导入备份，合并记录<input id="backupFile" type="file" accept=".json,application/json"></label><button id="exportOffline" class="secondary wide">导出离线网页版</button><p class="subtle">整合版把已经加载的棋谱嵌入新 HTML，不再依赖网络；不携带个人练习记录。换文件后请另行导入 JSON 备份。</p><p id="backupStatus" class="subtle" role="status"></p></div>
+ <div class="card library-card sources"><p><b>离线对战：</b>9 / 13 / 19 路，三档本地启蒙算法（不是职业级 AI，不对应任何段级位）。禁止自杀和全局同形重复；双方连续停一手后自动计分、播报胜负并保存；白贴 7.5。有限的本地死活分析无法确认的棋块暂留盘上，结果标为估算待复核；可继续下或请家长修正。含悔棋、提示、认输和 SGF 导出。</p><h2>内容与使用说明</h2><p><b>96 关启蒙：</b>24 个原创基础图，分别练习 4 个方向。包括提子、连接和落点顺序记忆；不是职业棋谱或定式教材。</p><p><b>420 题离线题库：</b>Go Game Guru / gogameguru/go-problems，原作采用 CC BY-NC-SA 4.0。全部 420 题已内置，训练时取第一参考主线；其他分支与英文评语不参与判分。中级第 50 题原文件末尾多余的一个右括号已修正，初始摆子与落子未改变。改编棋谱仍按相同许可证提供，仅限非商业使用；不代表原作者认可本工具。</p><p><b>32 关名局节选：</b>4 盘名局各取前 80 手，分成每段 10 手；来源为 frank_go 收录的公开对局数据，不包含原解说。</p><p><span>Go Game Guru 源仓库（来源地址见开发备份）</span> · <span>CC BY-NC-SA 4.0（来源地址见开发备份）</span> · <span>名局来源（来源地址见开发备份）</span></p><p class="subtle">程序代码为 MIT 许可；原创启蒙数据为 CC0。当前版本：2.8.0 · 自动结算与对战记录版。无需账号、无广告、无统计跟踪。应用不申请网络权限；所有内置关卡均已校验并随包提供。</p></div>
+ </div>
+</section>
+</main>
+<footer>围棋背谱闯关 2.8 · 全棋盘普通话B版 <span>记手顺，也要慢慢理解每一手。</span></footer>
+<div id="lessonHelpDialog" class="modal-layer" hidden role="dialog" aria-modal="true" aria-labelledby="lessonHelpTitle"><div class="modal-card"><div class="modal-heading"><h2 id="lessonHelpTitle">本关提示</h2><button id="closeLessonHelp" class="secondary" data-say="返回棋盘">返回棋盘 ×</button></div><div class="modal-body"><p id="lessonNote"></p><details class="source-details"><summary>棋谱来源与训练说明</summary><p id="levelSource"></p><p id="levelLicense"></p><p>这是手顺记忆训练，不是 AI 棋力判断。与参考谱不同不代表实战一定错误。黑白两方都由孩子复摆；局部题保留初始摆子。</p></details></div></div></div>
+<div id="confirmDialog" class="modal-layer" hidden role="dialog" aria-modal="true" aria-labelledby="confirmTitle"><div class="modal-card confirm-card"><h2 id="confirmTitle">正在练习这一关</h2><p id="confirmText"></p><div class="two-buttons"><button id="confirmStay" class="secondary">继续练习</button><button id="confirmGo" class="primary">切换关卡</button></div></div></div>
+<div id="battleDialog" class="modal-layer" hidden role="dialog" aria-modal="true" aria-labelledby="battleDialogTitle"><div class="modal-card battle-dialog-card"><h2 id="battleDialogTitle"></h2><p id="battleDialogText"></p><div class="two-buttons"><button id="battleDialogNo" class="secondary" data-say="对战取消">↩ 返回</button><button id="battleDialogYes" class="primary">✓ 确定</button></div></div></div>
+<div id="battleSetup" class="modal-layer" hidden role="dialog" aria-modal="true" aria-labelledby="battleSetupTitle"><div class="modal-card battle-setup-card"><div class="modal-heading"><h2 id="battleSetupTitle">新一局</h2><button id="battleSetupClose" class="secondary" data-say="对战取消">✕ 返回</button></div><p class="muted">新开一局会替换未完成对局，不影响闯关记录。</p><div class="setup-row"><b>棋盘</b><div class="setup-options"><button data-board-size="9" data-say="九路棋盘">▦ 9 路</button><button data-board-size="13" data-say="十三路棋盘">▦ 13 路</button><button data-board-size="19" data-say="十九路棋盘">▦ 19 路</button></div></div><div class="setup-row"><b>棋子</b><div class="setup-options"><button data-human="1" data-say="黑棋先走">● 执黑先走</button><button data-human="2" data-say="白棋后走">○ 执白后走</button></div></div><div class="setup-row"><b>对手</b><div class="setup-options"><button data-setup-difficulty="0" data-say="对战轻松">★ 轻松</button><button data-setup-difficulty="1" data-say="对战认真">★★ 认真</button><button data-setup-difficulty="2" data-say="对战挑战">★★★ 挑战</button></div></div><button id="battleSetupGo" class="primary wide" data-say="开始对战">▶ 开始对战</button></div></div>
+<div id="battleInfo" class="modal-layer" hidden role="dialog" aria-modal="true" aria-labelledby="battleInfoTitle"><div class="modal-card"><div class="modal-heading"><h2 id="battleInfoTitle">对战玩法</h2><button id="battleInfoClose" class="secondary" data-say="返回对战">✕ 返回</button></div><div id="battleInfoBody" class="modal-body"></div></div></div>
+<div id="rotateNotice" role="status"><span aria-hidden="true">⤾</span><h1>请横放平板</h1><p>横屏后，棋盘和按钮可以完整显示。</p><button class="primary" data-say="请横放平板">🔊 请横放平板</button></div>
+<div id="toast" role="status" aria-live="polite" hidden></div>
+<div id="loading" class="loading-layer" hidden><div class="card"><div class="spinner"></div><p id="loadingText">正在读取棋谱…</p></div></div>
+
+<script id="extraData" type="application/json">[]</script>
+
+
+
+
+
+
+
+<script src="compat.js"></script><script src="games.js"></script><script src="engine.js"></script><script src="catalog.js"></script><script src="voice-map.js"></script><script src="voice.js"></script><script src="battle-engine.js"></script><script src="battle.js"></script><script src="app.js"></script></body></html>

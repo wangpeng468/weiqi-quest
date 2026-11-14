@@ -1,0 +1,10 @@
+配音来源与边界
+================
+本应用配音选用用户确认的 B 音色：matcha-icefall-zh-en，sid=0，speed=0.96。
+所有配音在制作端提前合成；APK 内没有语音模型或合成运行库，只含原创提示文案的音频。
+没有克隆真人声音，没有逐字拼接。音频属于 AI 合成，不是真人录音。
+原模型说明：https://k2-fsa.github.io/sherpa/onnx/tts/all/Chinese-English/matcha-icefall-zh-en.html
+原模型来源：https://modelscope.cn/models/dengcunqin/matcha_tts_zh_en_20251010
+生成工具：sherpa-onnx。原训练代码：k2-fsa/icefall 的 baker_zh/TTS/matcha。
+模型没有随应用分发；对模型或数据的进一步再分发、商业使用需另行核对授权。
+围棋题库仍采用其各自许可证；本应用整体供家庭非商业学习使用。

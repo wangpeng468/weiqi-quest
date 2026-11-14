@@ -1,0 +1,24 @@
+# Private signing material: NEVER upload these files
+private-signing/
+*.jks
+*.keystore
+*.pem
+*.p12
+*.pfx
+
+# Local build products and personal records
+build/
+dist/
+node_modules/
+__pycache__/
+*.pyc
+*.apk
+*.aab
+.env
+.env.*
+*personal-progress*.json
+*learning-record*.json
+
+# Restored binary assets live in resources/offline-assets.part*
+assets/audio/
+assets/sgf/

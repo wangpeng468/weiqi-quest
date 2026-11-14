@@ -1,0 +1,426 @@
+[
+  {
+    "key": "对战练习",
+    "text": "我们来和电脑下围棋吧。",
+    "id": "03f2f341e6c6b8c225227ca220ff2dce7892c2a40c6cb6a55be99025dac0942d",
+    "path": "audio/03f2f341e6c6b8c225227ca220ff2dce7892c2a40c6cb6a55be99025dac0942d.mp3",
+    "seconds": 1.9,
+    "sha256": "6b1a634e30d35a2302629703e934331cb37b40c98e7865f0637beadd35be79cb"
+  },
+  {
+    "key": "对战轻松",
+    "text": "轻松模式，慢慢练，别着急。",
+    "id": "b379c0e5f43fdd96e7fde9ab07fcf196acc7dfa2cca8b83e7fdd766f56eea490",
+    "path": "audio/b379c0e5f43fdd96e7fde9ab07fcf196acc7dfa2cca8b83e7fdd766f56eea490.mp3",
+    "seconds": 2.82,
+    "sha256": "9bcbfcb74e391231b778e0b9879bb49ccc7e5672487a416cb7d7a58771cd26c1"
+  },
+  {
+    "key": "对战认真",
+    "text": "认真模式，电脑会认真保护棋子。",
+    "id": "1028648065db7d388e39ca46e1a39f5b6d9acfca44ee59c76a3e8471c9ba5db5",
+    "path": "audio/1028648065db7d388e39ca46e1a39f5b6d9acfca44ee59c76a3e8471c9ba5db5.mp3",
+    "seconds": 2.98,
+    "sha256": "0f4160e578c01592a8d4e21133e46d384987ec658458929204e2b4d9137b54ad"
+  },
+  {
+    "key": "对战挑战",
+    "text": "挑战模式，先想一想，再落子。",
+    "id": "2a6f200ed921c304776e4ae1731076ca4751f507256de8655477a72f3fca9e9a",
+    "path": "audio/2a6f200ed921c304776e4ae1731076ca4751f507256de8655477a72f3fca9e9a.mp3",
+    "seconds": 2.96,
+    "sha256": "52f8dba7f59611461e7a657252b25331b28a1788ab532fce6ed4e7a9e1097eea"
+  },
+  {
+    "key": "九路棋盘",
+    "text": "九路小棋盘，适合刚开始练习。",
+    "id": "982636c926809b968b5ccf0f1212c0a43ce338b18bde6937c64e935715e6adaf",
+    "path": "audio/982636c926809b968b5ccf0f1212c0a43ce338b18bde6937c64e935715e6adaf.mp3",
+    "seconds": 3.27,
+    "sha256": "17720995ca9be4402162ff5863532581149c2dcac3505b0121e78dc646eafcdf"
+  },
+  {
+    "key": "十三路棋盘",
+    "text": "十三路棋盘，试试更大的棋盘。",
+    "id": "9320a16e722acf1310dc08d5fdc7d21fd557dbfa5901d25ccce35a049512cc76",
+    "path": "audio/9320a16e722acf1310dc08d5fdc7d21fd557dbfa5901d25ccce35a049512cc76.mp3",
+    "seconds": 3.3,
+    "sha256": "3c754bcf28d4eaa502a9184deaee1fb3fe869fc10caab7166ac1b45247cd8d26"
+  },
+  {
+    "key": "十九路棋盘",
+    "text": "十九路大棋盘。",
+    "id": "22faae0a3fe853a45a09fe2c977364610e2e1f8e0955592d3b54e3fd6246c87e",
+    "path": "audio/22faae0a3fe853a45a09fe2c977364610e2e1f8e0955592d3b54e3fd6246c87e.mp3",
+    "seconds": 1.57,
+    "sha256": "807c75ed4270012e8ddb4e65bc5bafeaa4c2a77eaa1ea3681ffb62afe9b74837"
+  },
+  {
+    "key": "黑棋先走",
+    "text": "你拿黑棋，先下第一手。",
+    "id": "a7c327ccf68cbcf9921b93e0de4724dd3fdd470e551960a151731b5293783e39",
+    "path": "audio/a7c327ccf68cbcf9921b93e0de4724dd3fdd470e551960a151731b5293783e39.mp3",
+    "seconds": 2.25,
+    "sha256": "710f57799e8e841c2f47d964e7fcd9931fc315e2b35a103d12faeb9bbbc95fcd"
+  },
+  {
+    "key": "白棋后走",
+    "text": "你拿白棋，让电脑先下。",
+    "id": "26714c34ffa9ee06ab23a9afce44a1f6e7371bf575d384b6881b8e77ca9b2e97",
+    "path": "audio/26714c34ffa9ee06ab23a9afce44a1f6e7371bf575d384b6881b8e77ca9b2e97.mp3",
+    "seconds": 2.14,
+    "sha256": "6e8223d46c37cbf6aba911f3bc6398b4d691fa245ef2cff476354b588e3bb0e3"
+  },
+  {
+    "key": "开始对战",
+    "text": "准备好啦，我们开始下棋。",
+    "id": "5f9ec4ccc8bd4cc87bdf8f3406757842b7eccdc5d21144375bcbb7531bd5f9a3",
+    "path": "audio/5f9ec4ccc8bd4cc87bdf8f3406757842b7eccdc5d21144375bcbb7531bd5f9a3.mp3",
+    "seconds": 2.2,
+    "sha256": "212fbe4da0361cb5f5544ebbfe3ec1d75860687b1f2884d1b88df6080211d88c"
+  },
+  {
+    "key": "设置新对局",
+    "text": "选好棋盘和棋子颜色，再点开始对战。",
+    "id": "6f85ed315872ac3a7adae6dc4c58493fdda535fe2e0bef9ed9ba268bfa30280a",
+    "path": "audio/6f85ed315872ac3a7adae6dc4c58493fdda535fe2e0bef9ed9ba268bfa30280a.mp3",
+    "seconds": 3.76,
+    "sha256": "646f36148337582544b1b9235c313351591f4f914806e65d17bc5ddf6ee1b398"
+  },
+  {
+    "key": "轮到你了",
+    "text": "轮到你啦，想一想，再落子。",
+    "id": "b52263ff2d66895d4f167dd07c336d5a20488d5516dbc94f9e4f88b01c26206c",
+    "path": "audio/b52263ff2d66895d4f167dd07c336d5a20488d5516dbc94f9e4f88b01c26206c.mp3",
+    "seconds": 2.64,
+    "sha256": "49e8726786d9fdc3ce04164ef8fed705cc751ae403a154271e78c47a8239b752"
+  },
+  {
+    "key": "请下黑棋",
+    "text": "轮到你啦，请放一颗黑棋。",
+    "id": "d53e24aee3ef89bd81e76424aedcc6510ed1ce9bfe85b33ade20b99e2f130634",
+    "path": "audio/d53e24aee3ef89bd81e76424aedcc6510ed1ce9bfe85b33ade20b99e2f130634.mp3",
+    "seconds": 2.3,
+    "sha256": "df5f67d76992221d49f3a453b8f3675f10d97256494700deec690909803c4195"
+  },
+  {
+    "key": "请下白棋",
+    "text": "轮到你啦，请放一颗白棋。",
+    "id": "486b6e11de5e766961170cfe5ac02ff25052046d503f0f41318bbb531d60ee2f",
+    "path": "audio/486b6e11de5e766961170cfe5ac02ff25052046d503f0f41318bbb531d60ee2f.mp3",
+    "seconds": 2.27,
+    "sha256": "19d62c945a8c1e15a62b3414a1b2ee51b2d491634852451d0f47085994249556"
+  },
+  {
+    "key": "电脑在想",
+    "text": "电脑正在想，等它下完再落子。",
+    "id": "ebab229694199c903070deea887f6b71ff06d4fb59a06c6a78e5b437672bf9e0",
+    "path": "audio/ebab229694199c903070deea887f6b71ff06d4fb59a06c6a78e5b437672bf9e0.mp3",
+    "seconds": 3.03,
+    "sha256": "fb7b7f0a5d6512a68f978d8d9177015a3e936dce997941fc59def190089e5ed8"
+  },
+  {
+    "key": "电脑重试",
+    "text": "电脑暂停了，点这里再试一次。",
+    "id": "715ea648f077e517661663e052f1cf6f954bd1a1f993902b8b6f8310c18d5936",
+    "path": "audio/715ea648f077e517661663e052f1cf6f954bd1a1f993902b8b6f8310c18d5936.mp3",
+    "seconds": 2.94,
+    "sha256": "6db6c8bfb3a6638734c6dfb30ac9852f8cd0f6dbe45d4277416b6da82ca4ef00"
+  },
+  {
+    "key": "这里已经有棋子",
+    "text": "这里已经有棋子啦，换个空的交叉点。",
+    "id": "81f875cadd1b2d5f51279a1f45d7a14f58b195a3ae733fc63620d403b5d1d8ec",
+    "path": "audio/81f875cadd1b2d5f51279a1f45d7a14f58b195a3ae733fc63620d403b5d1d8ec.mp3",
+    "seconds": 3.16,
+    "sha256": "b392afdf6c3ba65da9e054fc9c6b5e3f6f7aa6203cac4e5de841705512a6b7f8"
+  },
+  {
+    "key": "这里没有气",
+    "text": "这里没有气，不能放。换个位置试试。",
+    "id": "6f9f278c2d0befbf395c32b9e63c4fb14dcdf25ea7b0fda7b8e5adf71d2837c2",
+    "path": "audio/6f9f278c2d0befbf395c32b9e63c4fb14dcdf25ea7b0fda7b8e5adf71d2837c2.mp3",
+    "seconds": 3.44,
+    "sha256": "12ce8b689f4268e439b6cd646e7fa1010c907805d908c85b9b0ba6bcc9e293bb"
+  },
+  {
+    "key": "不能马上打劫",
+    "text": "这样会重复之前的棋盘，请先下别处。",
+    "id": "8de3b1db0648a77fd5e1bf615ea4beadd68d5ce5f31a49ae7e412de9a1bc59de",
+    "path": "audio/8de3b1db0648a77fd5e1bf615ea4beadd68d5ce5f31a49ae7e412de9a1bc59de.mp3",
+    "seconds": 3.6,
+    "sha256": "d6d107c69aebda60ddbe23156388f454bd4cf7ce3c183ba08cc8bb74af8034e1"
+  },
+  {
+    "key": "点交叉点",
+    "text": "请把棋子放在线条交叉的地方。",
+    "id": "084c8445d3a56d35c58977ca49e6251b93f9828aeda59e4442ee9a68a09f5dae",
+    "path": "audio/084c8445d3a56d35c58977ca49e6251b93f9828aeda59e4442ee9a68a09f5dae.mp3",
+    "seconds": 2.77,
+    "sha256": "6fd94eea361472f9484cc557ede31722b415ff3ebaf0e17feb5fed4989705ba3"
+  },
+  {
+    "key": "对战悔棋",
+    "text": "悔棋，回到你上次落子之前。",
+    "id": "e3b3dac65b014010c168e25a15818df8079fff2443d66bc67640733d0915b52c",
+    "path": "audio/e3b3dac65b014010c168e25a15818df8079fff2443d66bc67640733d0915b52c.mp3",
+    "seconds": 2.59,
+    "sha256": "7b27d3948baa8456dd832804f9aa540935906e544de2b7cb922a38427aa0c5ad"
+  },
+  {
+    "key": "对战悔棋完成",
+    "text": "已经退回来了，你可以换个位置下。",
+    "id": "fcee9fdcd6f95059fce1551ba80a08c25b84774e5211872c41e29550418c4351",
+    "path": "audio/fcee9fdcd6f95059fce1551ba80a08c25b84774e5211872c41e29550418c4351.mp3",
+    "seconds": 3.05,
+    "sha256": "b971261827a7797c074bbba49a67f1108b53be6272254687d1bb85bc303f9952"
+  },
+  {
+    "key": "对战提示",
+    "text": "看一看，电脑建议你下在哪里。",
+    "id": "161a84e77363fe42a127fa9fe427d8ccc3f6dc70c452c7457874d077a009d6b0",
+    "path": "audio/161a84e77363fe42a127fa9fe427d8ccc3f6dc70c452c7457874d077a009d6b0.mp3",
+    "seconds": 2.51,
+    "sha256": "86bd95730615577ebd970a32eb2156d35915fd834b52c437fc41ea8203e643e5"
+  },
+  {
+    "key": "对战提示落点",
+    "text": "试试圈起来的位置。这只是一个建议哦。",
+    "id": "f896b5d392e393df593a86e7bc21beae81db274a076ebaf1c0c96472d749724e",
+    "path": "audio/f896b5d392e393df593a86e7bc21beae81db274a076ebaf1c0c96472d749724e.mp3",
+    "seconds": 3.47,
+    "sha256": "dc2cc214f981fc806fb55c1c6ea22580d1b6af0b3028a18741f3997ec60d237b"
+  },
+  {
+    "key": "提示停一手",
+    "text": "没有合适的落点了，可以试试停一手。",
+    "id": "c4c4b5edd8409f23b485ae8dcededb917cbf65a84fe67eb722127b090b647188",
+    "path": "audio/c4c4b5edd8409f23b485ae8dcededb917cbf65a84fe67eb722127b090b647188.mp3",
+    "seconds": 3.36,
+    "sha256": "dc331245fe712fe88e4242305b875dd63939596c78f2ee13398a5f9e16a3af2c"
+  },
+  {
+    "key": "对战停一手",
+    "text": "停一手，这一手先不落子。",
+    "id": "d949c458fe0cb74f0bae54a00f1c781431de22754b5d7963746792cd3ab1d39c",
+    "path": "audio/d949c458fe0cb74f0bae54a00f1c781431de22754b5d7963746792cd3ab1d39c.mp3",
+    "seconds": 2.25,
+    "sha256": "db9fec1aa536d8ae1c6a280612718c1641bc0cbad131d8987fb27fc27c52f6b6"
+  },
+  {
+    "key": "对战停手确认",
+    "text": "这一手先不落子，让电脑下，确定吗？",
+    "id": "e3930aeb6aa0dafc49ee67b60bd70b9a82cf8496ab283c37ab5f5484b3439ce3",
+    "path": "audio/e3930aeb6aa0dafc49ee67b60bd70b9a82cf8496ab283c37ab5f5484b3439ce3.mp3",
+    "seconds": 3.4,
+    "sha256": "13f9fc642c4848a6d1eca9d797c436d934317d4d859b83b4fa6fa0814fd405fe"
+  },
+  {
+    "key": "对战确认停手",
+    "text": "好，这一手先不下。",
+    "id": "cd5e90d455d2b2c50c596025073900afd531e55e8ef089871d25b15b0e421ca1",
+    "path": "audio/cd5e90d455d2b2c50c596025073900afd531e55e8ef089871d25b15b0e421ca1.mp3",
+    "seconds": 1.65,
+    "sha256": "c14878c94419aa46cddb3d166fa63dca615fd3c9f61efb7f0bd2e26f45309354"
+  },
+  {
+    "key": "电脑停一手",
+    "text": "电脑停一手，现在轮到你。",
+    "id": "ae6f52f8776a125f56db745800e914de06a8496401e839ab9a176dabd6f4ade2",
+    "path": "audio/ae6f52f8776a125f56db745800e914de06a8496401e839ab9a176dabd6f4ade2.mp3",
+    "seconds": 2.72,
+    "sha256": "b4fecb645100b95273e40968a74ac679333a4c1dd4881c2144b4cc70753019db"
+  },
+  {
+    "key": "对战双方停手",
+    "text": "双方都停了一手。请和家长检查死子，再算分。",
+    "id": "df2e96b3b12b070e307f9ca80d96ff95a5f1456602b11c780579ea9330007514",
+    "path": "audio/df2e96b3b12b070e307f9ca80d96ff95a5f1456602b11c780579ea9330007514.mp3",
+    "seconds": 4.74,
+    "sha256": "c10c484aa2d5c7f9e86f7f449c91ed5edca683b910c459db8862bd129e76a7fd"
+  },
+  {
+    "key": "对战算分",
+    "text": "算分，看看谁围住的地方更多。",
+    "id": "e3229ff440ff271b18ed95f40f7691fdabed0dc9a26132433e387108e4ba5979",
+    "path": "audio/e3229ff440ff271b18ed95f40f7691fdabed0dc9a26132433e387108e4ba5979.mp3",
+    "seconds": 2.72,
+    "sha256": "e489f0565e7c688b7e7cd65f00eddb7e3ac8c677c4cc882a9aedac184a5c3e7e"
+  },
+  {
+    "key": "对战算分确认",
+    "text": "现在检查棋盘吗？检查后也可以继续下。",
+    "id": "19b201d6210151c4a7ce7be1273ad8b7f75d740660859f6c5a01cef7caa33277",
+    "path": "audio/19b201d6210151c4a7ce7be1273ad8b7f75d740660859f6c5a01cef7caa33277.mp3",
+    "seconds": 3.86,
+    "sha256": "129f6879854ec66fd19183b828bc0ef0c64635adcfe5658761db346e11408ef2"
+  },
+  {
+    "key": "对战检查棋盘",
+    "text": "我们来检查棋盘。",
+    "id": "4f3d95deb9552fdf4b1aaabee705f8f310cf6c8f0e62bceff74e5a1e00717d9f",
+    "path": "audio/4f3d95deb9552fdf4b1aaabee705f8f310cf6c8f0e62bceff74e5a1e00717d9f.mp3",
+    "seconds": 1.71,
+    "sha256": "0227023d4bcd7573285efe652cf36e97145f06366c5198c5d82ed57d95ffdc5a"
+  },
+  {
+    "key": "对战标记死子",
+    "text": "请家长一起检查。点死棋画叉，再点一次取消。检查好了，再确认结果。",
+    "id": "fb9b87cc9d2205bcef93ced5f254e812b7ca3842f5dbf77dd5051bb21217b6b6",
+    "path": "audio/fb9b87cc9d2205bcef93ced5f254e812b7ca3842f5dbf77dd5051bb21217b6b6.mp3",
+    "seconds": 6.76,
+    "sha256": "fa6091aadb98c371124f51d3b10a1342da84aa10c3f9a09a31e51bc86a4fdab9"
+  },
+  {
+    "key": "已标记死子",
+    "text": "这块棋已经标记为死子。再点一次可以取消。",
+    "id": "a9dd74f97bb08110ce99dbc718d825c1d6f832ebbe89961810732f6a4a9876a2",
+    "path": "audio/a9dd74f97bb08110ce99dbc718d825c1d6f832ebbe89961810732f6a4a9876a2.mp3",
+    "seconds": 4.11,
+    "sha256": "6287c87c61fd0f777b7cfe1e69ff8880aa6d3fbb8bede8df635f5795e8e69fce"
+  },
+  {
+    "key": "取消死子标记",
+    "text": "已经取消这块棋的死子标记。",
+    "id": "2ef8385aa43d2e51ff506f641694fe25bd05ac712bdaaf79d6aa79e3da7ef344",
+    "path": "audio/2ef8385aa43d2e51ff506f641694fe25bd05ac712bdaaf79d6aa79e3da7ef344.mp3",
+    "seconds": 2.66,
+    "sha256": "034374a6d61194794bd891ba473e3f91481f4de07cc3eb944f6323158adb3f7a"
+  },
+  {
+    "key": "对战继续下棋",
+    "text": "还没下完，我们继续下棋。",
+    "id": "35568dfa68492542ff6e0703783466af728cf6f3531e49590b0ee8e046193fb5",
+    "path": "audio/35568dfa68492542ff6e0703783466af728cf6f3531e49590b0ee8e046193fb5.mp3",
+    "seconds": 2.32,
+    "sha256": "da63d5edbe653263f9c71d792ef99ea3432f709dccbc9c7dff0bab55b49e0792"
+  },
+  {
+    "key": "对战确认结果",
+    "text": "确认结果，保存这一局。",
+    "id": "ced7dc7e4385b9d7afc61a54c861be5e5450081ee7e4d5a54f5d2fb662b4d4e3",
+    "path": "audio/ced7dc7e4385b9d7afc61a54c861be5e5450081ee7e4d5a54f5d2fb662b4d4e3.mp3",
+    "seconds": 2.2,
+    "sha256": "2f8ce091db7fd81373d96160cf6c6d06f288bbcb0841980d020afcb36b3caa1c"
+  },
+  {
+    "key": "对战认输",
+    "text": "认输会结束这一局。",
+    "id": "d50cd2d006828f1c9887957ce089e37da27070f4226268c15283a678864959e4",
+    "path": "audio/d50cd2d006828f1c9887957ce089e37da27070f4226268c15283a678864959e4.mp3",
+    "seconds": 1.91,
+    "sha256": "870336660c30b64302661c5ff5e7ac2bfb5539719b2b0e8a6897b2678baafabf"
+  },
+  {
+    "key": "对战认输确认",
+    "text": "要认输，结束这一局吗？也可以返回继续下。",
+    "id": "76a594f7d757993fd6c600291230859a03235c142eda2d114167d01ff4b3f7d8",
+    "path": "audio/76a594f7d757993fd6c600291230859a03235c142eda2d114167d01ff4b3f7d8.mp3",
+    "seconds": 3.87,
+    "sha256": "8d6f73770e7e30590f7d1643d350abaeae8a1fa889446cf7bebfd14ec851fa65"
+  },
+  {
+    "key": "对战确认认输",
+    "text": "这一局结束啦。我们再练习。",
+    "id": "efc34f5b51437380d9244b34980d02ab43c8ffe9819fd3b94a83171912581511",
+    "path": "audio/efc34f5b51437380d9244b34980d02ab43c8ffe9819fd3b94a83171912581511.mp3",
+    "seconds": 2.73,
+    "sha256": "9f9a58e5f187f54b1206e636873779086251fbbfbb86dda0f6c47da86bb61fc3"
+  },
+  {
+    "key": "对战确定",
+    "text": "确定。",
+    "id": "9bc08f69bbbc304e0cb4b9d9cc4485e080880a820174e84c78f1f22e0af306e1",
+    "path": "audio/9bc08f69bbbc304e0cb4b9d9cc4485e080880a820174e84c78f1f22e0af306e1.mp3",
+    "seconds": 0.76,
+    "sha256": "804b70037512cb9cefb4bc092e41d9556aa095a2ebb1f668aa71914335c9787a"
+  },
+  {
+    "key": "对战取消",
+    "text": "返回，不改变这盘棋。",
+    "id": "91d081389dd9c96aed0a4cec2440174af8ef8802b1ffa24947ee1d7f3bd2830d",
+    "path": "audio/91d081389dd9c96aed0a4cec2440174af8ef8802b1ffa24947ee1d7f3bd2830d.mp3",
+    "seconds": 1.86,
+    "sha256": "ef7d441bc9c918ae7c6247f1f81200584dbbad449522997665c799cc0f28b76c"
+  },
+  {
+    "key": "新开一局",
+    "text": "选好设置，再开始新的一局。",
+    "id": "ce5037b944cc6d01d9e5a336b9efb6dc1e585f3a22f44eca55e55ff9af8d1aa7",
+    "path": "audio/ce5037b944cc6d01d9e5a336b9efb6dc1e585f3a22f44eca55e55ff9af8d1aa7.mp3",
+    "seconds": 2.6,
+    "sha256": "c2e337030f0ed2efbea81db9d6019e56f8abf43e8386a077312e216c80741265"
+  },
+  {
+    "key": "再下一局",
+    "text": "我们再下一局吧。",
+    "id": "a5039a5c8c39e43fcc959374e43dbde811d073a25f5249badf1b7c4866f440e1",
+    "path": "audio/a5039a5c8c39e43fcc959374e43dbde811d073a25f5249badf1b7c4866f440e1.mp3",
+    "seconds": 1.56,
+    "sha256": "ac5889c944a344876aa35613b13c96ffa031485efa15e2126402d2fe104bccae"
+  },
+  {
+    "key": "对战赢了",
+    "text": "你赢啦，真棒！再接再厉。",
+    "id": "980ee823c8c590b69938f375d6f2eb17e649c0ee64826a2fc0cec0080d91de02",
+    "path": "audio/980ee823c8c590b69938f375d6f2eb17e649c0ee64826a2fc0cec0080d91de02.mp3",
+    "seconds": 2.47,
+    "sha256": "8bc3bb0a136b88dd942fef99778a2a5e91d519c2f7ac0025a54be78626bace9e"
+  },
+  {
+    "key": "对战结束鼓励",
+    "text": "这次电脑获胜。别着急，我们再练一局吧。",
+    "id": "a0d63932ebd62cd83cc806d889fdf78c658da6ed7253ef117c6842a81835960a",
+    "path": "audio/a0d63932ebd62cd83cc806d889fdf78c658da6ed7253ef117c6842a81835960a.mp3",
+    "seconds": 3.6,
+    "sha256": "d12561874e5aa0a334f48a7dd3e3fb13a6051b3b56b557b7f31c339851ac2ee2"
+  },
+  {
+    "key": "对战结果已保存",
+    "text": "这一局已经保存在平板里了。",
+    "id": "d12c673d12403ca7eef967c02743983fde6b345072556fb957b704f94f6ddad7",
+    "path": "audio/d12c673d12403ca7eef967c02743983fde6b345072556fb957b704f94f6ddad7.mp3",
+    "seconds": 2.61,
+    "sha256": "b9ea6e79879d4ef44d435d85a19ad0eb4148ecda680c80612ea1b9ef509d071e"
+  },
+  {
+    "key": "对战记录",
+    "text": "看看以前的对战记录。",
+    "id": "e12c8b94c553ea30eaac41423374bcfd592b0be78b26cfdb0ccd47f7056ee394",
+    "path": "audio/e12c8b94c553ea30eaac41423374bcfd592b0be78b26cfdb0ccd47f7056ee394.mp3",
+    "seconds": 1.98,
+    "sha256": "6cbd21fad9e745e718942f85514f6079548d164c3ad8441a06712ef3777cbc66"
+  },
+  {
+    "key": "看看这盘棋",
+    "text": "看看这盘棋，还可以导出棋谱，慢慢复盘。",
+    "id": "f0cb96909b38576c8101b40d9ce3778c2939ca0981e8bc9c8a90dc3b3e773ac7",
+    "path": "audio/f0cb96909b38576c8101b40d9ce3778c2939ca0981e8bc9c8a90dc3b3e773ac7.mp3",
+    "seconds": 4.35,
+    "sha256": "38af6501970dda98a20250effdf30f796d2f39c36564459b164e2ddcc3e1b468"
+  },
+  {
+    "key": "导出对战棋谱",
+    "text": "请家长选择位置，保存这盘棋谱。",
+    "id": "fe3b94cc1f21ceef317a9b8c29c0d72b9fbe3463e280e2b722482c90a8de620b",
+    "path": "audio/fe3b94cc1f21ceef317a9b8c29c0d72b9fbe3463e280e2b722482c90a8de620b.mp3",
+    "seconds": 3.28,
+    "sha256": "1e267e594fa2b5272247212b0a206c8827ce9974319abd8e8a6588d0554fc394"
+  },
+  {
+    "key": "返回对战",
+    "text": "回到对战棋盘。",
+    "id": "6859a8b45f2f62278092c5eb9be13b047c091630b0fe06988a77e1f03edf26ba",
+    "path": "audio/6859a8b45f2f62278092c5eb9be13b047c091630b0fe06988a77e1f03edf26ba.mp3",
+    "seconds": 1.45,
+    "sha256": "0e79a5285e4ec5a8c024343bca28f154a907352cb500ea1ada1506ab95c82464"
+  },
+  {
+    "key": "对战玩法",
+    "text": "你和电脑轮流下棋。点击交叉点落子。想改一改就点悔棋，不知道下哪里可以看提示。算分时，请家长一起检查。",
+    "id": "afe8bd4e1255291b22fa9e420df296b7a8433999f043d0e1ad6d68bc46562777",
+    "path": "audio/afe8bd4e1255291b22fa9e420df296b7a8433999f043d0e1ad6d68bc46562777.mp3",
+    "seconds": 10.21,
+    "sha256": "4851e6d8d6b6368323593ef87a6cf704464f02ae0177ca401a3c852192fd648c"
+  }
+]

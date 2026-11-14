@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "tests": [
+    "settled regions: area + white komi, neutral points excluded",
+    "area scoring never adds captured prisoners twice",
+    "clearly enclosed small dead group removed after defender-first local proof",
+    "surrounded enemy with two real eyes remains alive",
+    "ko-dependent capture is not marked dead",
+    "large open or unresolved groups remain on board, not all treated as dead",
+    "empty-board early ending explicitly provisional",
+    "bounded-reading exhaustion leaves uncertain group untouched",
+    "9, 13, 19 scoring preserves board and area totals",
+    "rotations/reflections do not change scores",
+    "save/load interrupted judging phase and pass count"
+  ],
+  "scope": "Conservative local fixtures, not proof of general Go life/death or tournament-grade scoring."
+}
