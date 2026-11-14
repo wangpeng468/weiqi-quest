@@ -8,6 +8,7 @@ import android.content.res.AssetFileDescriptor;
 import android.graphics.Color;
 import android.media.AudioAttributes;
 import android.media.MediaPlayer;
+import android.media.SoundPool;
 import android.net.Uri;
 import android.os.*;
 import android.view.*;
@@ -39,6 +40,16 @@ public final class MainActivity extends Activity {
     private MediaPlayer voicePlayer;
     private volatile boolean voicePlaying;
     private volatile int voiceDuration;
+    private SoundPool soundPool;
+    private final Map<String, Integer> soundSamples = new HashMap<String, Integer>();
+    private final Set<Integer> loadedSounds = new HashSet<Integer>();
+    private final ArrayList<Integer> activeSoundStreams = new ArrayList<Integer>();
+    private volatile boolean soundEnabled = true;
+    private volatile String soundError = "";
+    private static final String[] SOUND_NAMES = {
+        "stone", "capture", "correct", "error", "pass", "undo",
+        "hint", "mark", "finish", "toggle"
+    };
 
     private SharedPreferences records() { return getSharedPreferences("weiqi_records", MODE_PRIVATE); }
     private int dp(int n) { return (int)(n * getResources().getDisplayMetrics().density + 0.5f); }
@@ -52,6 +63,7 @@ public final class MainActivity extends Activity {
         root = new FrameLayout(this);
         root.setBackgroundColor(0xfff5f6f0);
         setContentView(root);
+        initSoundEffects();
         buildRecovery(); // Visible independently of HTML / JavaScript / WebView.
         openApp(records().getBoolean("software_rendering", false));
         if (Build.VERSION.SDK_INT >= 33) { try { Api33.registerBack(this); } catch (Throwable ignored) {} }
@@ -69,7 +81,7 @@ public final class MainActivity extends Activity {
         status.setMaxLines(9);
         status.setEllipsize(android.text.TextUtils.TruncateAt.END);
         status.setGravity(Gravity.CENTER);
-        status.setText("正在打开围棋棋盘…\n棋谱、B 音色均在安装包内，无需联网。\nv2.7.0");
+        status.setText("正在打开围棋棋盘…\n棋谱、B 音色均在安装包内，无需联网。\nv2.9.2");
         recovery.addView(status, new LinearLayout.LayoutParams(-1, -2));
         LinearLayout row = new LinearLayout(this);
         row.setGravity(Gravity.CENTER);
@@ -98,13 +110,14 @@ public final class MainActivity extends Activity {
         ready = false; manualRecovery = false; lastError = ""; softRendering = software;
         records().edit().putBoolean("software_rendering", software).apply(); final int ticket = ++generation;
         stopVoice();
+        stopSoundEffects();
         if (web != null) {
             root.removeView(web);
             try { web.stopLoading(); web.removeJavascriptInterface("GoAndroid"); web.destroy(); } catch (Throwable ignored) {}
             web = null;
         }
         recovery.setVisibility(View.VISIBLE);
-        status.setText("正在打开围棋棋盘…\n无需联网，不会清除练习记录。\nv2.7.0 · " + (software ? "兼容显示" : "标准显示"));
+        status.setText("正在打开围棋棋盘…\n无需联网，不会清除练习记录。\nv2.9.2 · " + (software ? "兼容显示" : "标准显示"));
         try {
             web = new WebView(this);
             WebSettings s = web.getSettings();
@@ -158,7 +171,7 @@ public final class MainActivity extends Activity {
             records().edit().putString("last_startup_error", lastError).apply();
             if (!ready) {
                 recovery.setVisibility(View.VISIBLE); recovery.bringToFront();
-                status.setText("棋盘尚未打开 · v2.7.0\n" + lastError + "\n\n" + deviceSummary());
+                status.setText("棋盘尚未打开 · v2.9.2\n" + lastError + "\n\n" + deviceSummary());
             }
         }});
     }
@@ -281,6 +294,75 @@ public final class MainActivity extends Activity {
         }
         @JavascriptInterface public boolean isVoicePlaying() { return voicePlaying; }
         @JavascriptInterface public int voiceDurationMs() { return voiceDuration; }
+        @JavascriptInterface public boolean playSound(final String name) {
+            if (name == null || !validSoundName(name) || soundPool == null || destroyed) return false;
+            handler.post(new Runnable() { @Override public void run() { playLocalSound(name); }});
+            return true;
+        }
+        @JavascriptInterface public void setSoundEnabled(final boolean enabled) {
+            handler.post(new Runnable() { @Override public void run() {
+                soundEnabled = enabled;
+                if (!enabled) stopSoundEffects();
+            }});
+        }
+        @JavascriptInterface public String soundDiagnostics() {
+            return soundPool == null ? "Native SoundPool unavailable: " + soundError
+                : "Native SoundPool: " + loadedSounds.size() + "/" + SOUND_NAMES.length + " files loaded";
+        }
+    }
+    private static boolean validSoundName(String name) {
+        for (String valid : SOUND_NAMES) if (valid.equals(name)) return true;
+        return false;
+    }
+    private void initSoundEffects() {
+        try {
+            final AudioAttributes attributes = new AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_GAME)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build();
+            final SoundPool pool = new SoundPool.Builder()
+                .setMaxStreams(3).setAudioAttributes(attributes).build();
+            soundPool = pool;
+            pool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
+                @Override public void onLoadComplete(SoundPool player, int sampleId, int status) {
+                    if (player == soundPool && status == 0) loadedSounds.add(sampleId);
+                    else if (status != 0) soundError = "Could not decode bundled sound: " + sampleId;
+                }
+            });
+            for (String name : SOUND_NAMES) {
+                AssetFileDescriptor fd = getAssets().openFd("sfx/" + name + ".wav");
+                try {
+                    int sample = pool.load(fd, 1);
+                    if (sample <= 0) throw new IOException("SoundPool load failed: " + name);
+                    soundSamples.put(name, sample);
+                } finally { fd.close(); }
+            }
+        } catch (Exception ex) {
+            soundError = describe(ex);
+            disposeSoundEffects();
+        }
+    }
+    private void playLocalSound(String name) {
+        if (destroyed || !soundEnabled || soundPool == null) return;
+        Integer sample = soundSamples.get(name);
+        if (sample == null || !loadedSounds.contains(sample)) return;
+        try {
+            int stream = soundPool.play(sample, 0.85f, 0.85f, 1, 0, 1.0f);
+            if (stream > 0) {
+                activeSoundStreams.add(stream);
+                if (activeSoundStreams.size() > 16) activeSoundStreams.remove(0);
+            }
+        } catch (Exception ex) { soundError = describe(ex); }
+    }
+    private void stopSoundEffects() {
+        if (soundPool != null) for (Integer stream : activeSoundStreams) {
+            try { soundPool.stop(stream); } catch (Exception ignored) {}
+        }
+        activeSoundStreams.clear();
+    }
+    private void disposeSoundEffects() {
+        stopSoundEffects();
+        if (soundPool != null) { try { soundPool.release(); } catch (Exception ignored) {} soundPool = null; }
+        soundSamples.clear(); loadedSounds.clear();
     }
     private void playLocalVoice(String filename, final int ticket) {
         if (destroyed || ticket != voiceSequence.get()) return;
@@ -350,7 +432,7 @@ public final class MainActivity extends Activity {
         manualRecovery = true; stopVoice();
         if (web != null) web.evaluateJavascript("window.GoNativePause && window.GoNativePause()", null);
         recovery.setVisibility(View.VISIBLE); recovery.bringToFront();
-        status.setText("启动与显示诊断 · v2.7.0\n可选择兼容显示；练习记录不会清除。\n" +
+        status.setText("启动与显示诊断 · v2.9.2\n可选择兼容显示；练习记录不会清除。\n" +
             (lastError.isEmpty() ? "页面准备状态：" + (ready ? "已加载" : "未完成") : lastError) + "\n\n" + deviceSummary());
     }
     /** Isolated so Android 8–12 never resolve API 33 callback classes. */
@@ -367,10 +449,10 @@ public final class MainActivity extends Activity {
     @Override protected void onResume() { super.onResume(); enterFullscreen(); if (web != null) web.onResume(); }
     @Override protected void onPause() {
         if (web != null) { web.evaluateJavascript("window.GoNativePause && window.GoNativePause()", null); web.onPause(); }
-        stopVoice(); super.onPause();
+        stopVoice(); stopSoundEffects(); super.onPause();
     }
     @Override protected void onDestroy() {
-        destroyed = true; generation++; handler.removeCallbacksAndMessages(null); stopVoice();
+        destroyed = true; generation++; handler.removeCallbacksAndMessages(null); stopVoice(); disposeSoundEffects();
         if (chooser != null) { chooser.onReceiveValue(null); chooser = null; }
         if (web != null) { root.removeView(web); web.destroy(); web = null; }
         super.onDestroy();
