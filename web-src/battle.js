@@ -3,29 +3,29 @@
 (function(){
 'use strict';
 const E=window.BattleEngine,$=id=>document.getElementById(id),labels=['轻松','认真','挑战'];
-let host=null,game=null,human=1,difficulty=0,phase='playing',dead=[],result=null,id='',updatedAt='',active=false,busy=false,timer=null,ticket=0,geometry=null,hint=-1,wrong=-1,dialogAction=null,setup={n:9,human:1,difficulty:0},recordsPage=0,recordFilter='all';
+let host=null,game=null,human=1,difficulty=0,mode='ai',phase='playing',dead=[],result=null,id='',updatedAt='',active=false,busy=false,timer=null,ticket=0,geometry=null,hint=-1,wrong=-1,dialogAction=null,setup={n:9,human:1,difficulty:0,mode:'ai'},recordsPage=0,recordFilter='all';
 function speak(key){if(window.ButtonVoice)ButtonVoice.say(key);}
 function stamp(){return new Date().toISOString();}
-function save(){if(!host||!game)return;updatedAt=stamp();host.getState().battle={version:1,n:game.n,human,difficulty,phase,dead:dead.slice(),result,id,updatedAt,passes:game.passes,moves:game.moves.map(m=>({p:m.p,c:m.c}))};host.save();}
+function save(){if(!host||!game)return;updatedAt=stamp();host.getState().battle={version:1,n:game.n,human,difficulty,mode,phase,dead:dead.slice(),result,id,updatedAt,passes:game.passes,moves:game.moves.map(m=>({p:m.p,c:m.c}))};host.save();}
 function cancelAI(){ticket++;clearTimeout(timer);timer=null;busy=false;}
 function leave(){active=false;cancelAI();}
-function newGame(n,h,d){cancelAI();game=E.create(n);human=h;difficulty=d;phase='playing';dead=[];result=null;hint=-1;wrong=-1;id='battle-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8);save();render();if(active)scheduleAI();}
-function load(raw){const r=E.restore(raw);if(!r)return false;game=r.game;human=r.human;difficulty=r.difficulty;phase=r.phase;dead=r.dead;result=r.result;id=r.id;updatedAt=r.updatedAt;hint=-1;wrong=-1;return true;}
+function newGame(n,h,d,nextMode){cancelAI();game=E.create(n);human=h;difficulty=d;mode=nextMode==='local'?'local':'ai';phase='playing';dead=[];result=null;hint=-1;wrong=-1;id='battle-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8);save();render();if(active)scheduleAI();}
+function load(raw){const r=E.restore(raw);if(!r)return false;game=r.game;human=r.human;difficulty=r.difficulty;mode=r.mode;phase=r.phase;dead=r.dead;result=r.result;id=r.id;updatedAt=r.updatedAt;hint=-1;wrong=-1;return true;}
 function enter(){active=true;if(!game){newGame(9,1,0);}render();if(phase==='judging'||phase==='playing'&&game.passes>=2)autoFinish();else scheduleAI();}
 function status(text,key,icon,kind=''){$('battleStatusText').textContent=text;$('battleStatus').setAttribute('data-say',key);$('battleStatusIcon').textContent=icon||'●';$('battleStatus').className='battle-status'+(kind?' '+kind:'');}
-function canUndo(){return game&&phase==='playing'&&game.moves.some(m=>m.c===human);}
+function canUndo(){return !!(game&&phase==='playing'&&(mode==='local'?game.moves.length:game.moves.some(m=>m.c===human)));}
 function scheduleAI(){
- if(!active||!game||phase!=='playing'||game.turn===human||busy||document.hidden)return;
+ if(mode!=='ai'||!active||!game||phase!=='playing'||game.turn===human||busy||document.hidden)return;
  busy=true;render();const token=++ticket;
  timer=setTimeout(()=>{if(token!==ticket||!active||document.hidden)return;try{const p=E.choose(game,difficulty);if(token!==ticket)return;busy=false;apply(p,false);}catch(e){busy=false;status('电脑暂停了，点这里重试。','电脑重试','↻','error');console.warn('offline AI',e);} },450);
 }
 function apply(p,isHuman){
- if(!game||phase!=='playing'||(isHuman&&(busy||game.turn!==human)))return false;
+ if(!game||phase!=='playing'||mode==='local'&&!isHuman||(isHuman&&(busy||mode==='ai'&&game.turn!==human)))return false;
  const r=E.play(game,p);if(!r.ok){wrong=p;const k=r.reason==='occupied'?'这里已经有棋子':r.reason==='suicide'?'这里没有气':r.reason==='ko'?'不能马上打劫':'点交叉点';status(k,k,'!','error');speak(k);renderBoard();return false;}
  hint=-1;wrong=-1;
  if(game.passes>=2){autoFinish();return true;}
  save();render();
- if(isHuman)scheduleAI();else if(p<0){status('电脑停一手，轮到你了。','电脑停一手','✋');speak('电脑停一手');}else if(active)speak('轮到你了');
+ if(mode==='local'){if(active)speak(game.turn===1?'请下黑棋':'请下白棋');}else if(isHuman)scheduleAI();else if(p<0){status('电脑停一手，轮到你了。','电脑停一手','✋');speak('电脑停一手');}else if(active)speak('轮到你了');
  return true;
 }
 function ask(title,text,key,action,yes='✓ 确定',yesKey='对战确定'){
@@ -45,19 +45,19 @@ function cleanHistory(a){
  const seen={},out=[];
  for(const x of a.slice(0,1000)){
   if(!x||typeof x.id!=='string'||typeof x.date!=='string'||!Number.isFinite(Date.parse(x.date))||[9,13,19].indexOf(x.n)<0||[1,2].indexOf(x.human)<0||[0,1,2].indexOf(x.winner)<0||[0,1,2].indexOf(x.difficulty)<0)continue;
-  const row={id:x.id.slice(0,80),date:x.date.slice(0,35),updatedAt:typeof x.updatedAt==='string'&&Number.isFinite(Date.parse(x.updatedAt))?x.updatedAt.slice(0,35):x.date.slice(0,35),n:x.n,human:x.human,winner:x.winner,difficulty:x.difficulty,moves:Math.max(0,Math.min(3000,Math.floor(Number(x.moves)||0))),reason:x.reason==='resign'?'resign':'score',method:['auto','manual'].indexOf(x.method)>=0?x.method:'legacy',provisional:x.provisional===true,black:null,white:null,komi:null,margin:null,autoDead:Math.max(0,Math.min(x.n*x.n,Number(x.autoDead)||0)),unsettledGroups:Math.max(0,Math.min(x.n*x.n,Number(x.unsettledGroups)||0))};
+  const row={id:x.id.slice(0,80),mode:x.mode==='local'?'local':'ai',date:x.date.slice(0,35),updatedAt:typeof x.updatedAt==='string'&&Number.isFinite(Date.parse(x.updatedAt))?x.updatedAt.slice(0,35):x.date.slice(0,35),n:x.n,human:x.human,winner:x.winner,difficulty:x.difficulty,moves:Math.max(0,Math.min(3000,Math.floor(Number(x.moves)||0))),reason:x.reason==='resign'?'resign':'score',method:['auto','manual'].indexOf(x.method)>=0?x.method:'legacy',provisional:x.provisional===true,black:null,white:null,komi:null,margin:null,autoDead:Math.max(0,Math.min(x.n*x.n,Number(x.autoDead)||0)),unsettledGroups:Math.max(0,Math.min(x.n*x.n,Number(x.unsettledGroups)||0))};
   if(row.reason==='score'&&Number.isFinite(x.black)&&Number.isFinite(x.white)&&Number.isFinite(x.komi)&&x.black>=0&&x.white>=0&&x.black+x.white<=x.n*x.n&&Math.abs(x.komi)<=100){row.black=x.black;row.white=x.white;row.komi=x.komi;row.margin=Math.abs(x.black-x.white-x.komi);row.winner=x.black>x.white+x.komi?1:x.black<x.white+x.komi?2:0;}
   if(!seen[row.id]||row.updatedAt>seen[row.id].updatedAt)seen[row.id]=row;
  }
- for(const k of Object.keys(seen))out.push(seen[k]);return out.sort((a,b)=>b.date.localeCompare(a.date)).slice(0,100);
+ for(const k of Object.keys(seen))out.push(seen[k]);out.sort((a,b)=>b.date.localeCompare(a.date));const counts={ai:0,local:0};return out.filter(x=>counts[x.mode]++<100);
 }
 function cleanVoids(a){const m={};for(const x of Array.isArray(a)?a.slice(0,1000):[])if(x&&typeof x.id==='string'&&typeof x.date==='string'&&Number.isFinite(Date.parse(x.date)))if(!m[x.id]||m[x.id]<x.date)m[x.id]=x.date;return Object.keys(m).map(id=>({id:id.slice(0,80),date:m[id]}));}
 function syncRows(rows){const v={};for(const x of cleanVoids(host.getState().battleVoids))v[x.id]=x.date;host.getState().battleHistory=cleanHistory(rows).filter(x=>!v[x.id]||x.updatedAt>v[x.id]);}
-function resultVoice(r){return r.provisional?(r.winner===0?'估算和棋':r.winner===human?'估算你赢了':'估算电脑赢了'):(r.winner===0?'对战和棋':r.winner===human?'对战赢了':'对战结束鼓励');}
+function resultVoice(r){if(mode==='local')return r.winner===0?'对战和棋':'对战结果已保存';return r.provisional?(r.winner===0?'估算和棋':r.winner===human?'估算你赢了':'估算电脑赢了'):(r.winner===0?'对战和棋':r.winner===human?'对战赢了':'对战结束鼓励');}
 function finish(r){
  if(!game||!r||[0,1,2].indexOf(r.winner)<0)return;cancelAI();result=r;phase='finished';
  const rows=history().filter(x=>x.id!==id),date=stamp();
- rows.unshift({id,date,updatedAt:date,n:game.n,human,difficulty,moves:game.moves.length,winner:r.winner,reason:r.reason,method:r.method||'manual',provisional:!!r.provisional,black:r.black,white:r.white,komi:r.komi,margin:r.margin,autoDead:r.autoDead||0,unsettledGroups:r.unsettledGroups||0});
+ rows.unshift({id,date,updatedAt:date,n:game.n,mode,human,difficulty,moves:game.moves.length,winner:r.winner,reason:r.reason,method:r.method||'manual',provisional:!!r.provisional,black:r.black,white:r.white,komi:r.komi,margin:r.margin,autoDead:r.autoDead||0,unsettledGroups:r.unsettledGroups||0});
  host.getState().battleVoids=cleanVoids(host.getState().battleVoids).filter(x=>x.id!==id);syncRows(rows);save();render();renderRecords();speak(resultVoice(r));
 }
 function resumeGame(){
@@ -65,8 +65,8 @@ function resumeGame(){
  if(history().some(x=>x.id===id)){host.getState().battleHistory=history().filter(x=>x.id!==id);host.getState().battleVoids=cleanVoids((host.getState().battleVoids||[]).concat([{id,date:stamp()}]));}
  phase='playing';result=null;game.passes=0;dead=[];hint=-1;wrong=-1;save();render();renderRecords();scheduleAI();
 }
-function undo(){if(!canUndo())return;cancelAI();game=E.undo(game,human);hint=-1;wrong=-1;dead=[];save();render();speak('对战悔棋完成');scheduleAI();}
-function suggest(){if(!game||phase!=='playing'||busy||game.turn!==human)return;hint=E.choose(game,2,()=>.5);wrong=-1;renderBoard();if(hint<0){status('没有合适的落点，可以停一手。','提示停一手','✋');speak('提示停一手');}else{speak('对战提示落点');}}
+function undo(){if(!canUndo())return;cancelAI();game=mode==='local'?E.rebuild(game.n,game.moves.slice(0,-1)):E.undo(game,human);hint=-1;wrong=-1;dead=[];save();render();speak('对战悔棋完成');scheduleAI();}
+function suggest(){if(!game||phase!=='playing'||busy||mode==='local'||game.turn!==human)return;hint=E.choose(game,2,()=>.5);wrong=-1;renderBoard();if(hint<0){status('没有合适的落点，可以停一手。','提示停一手','✋');speak('提示停一手');}else{speak('对战提示落点');}}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function renderBoard(){
  if(!game)return;const n=game.n,margin=33,step=(600-2*margin)/(n-1),b=game.board;
@@ -92,10 +92,12 @@ function renderBoard(){
 }
 function render(){
  if(!game)return;
- $('battleSummary').textContent=game.n+' 路 · 你执'+(human===1?'黑棋 ●':'白棋 ○')+' · 白贴 7.5';
+ $('battle').dataset.mode=mode;
+ $('battleModeTitle').textContent=mode==='local'?'两个人下围棋':'和电脑下围棋';
+ $('battleSummary').textContent=mode==='local'?game.n+' 路 · 黑白轮流下 · 白贴 7.5':game.n+' 路 · 你执'+(human===1?'黑棋 ●':'白棋 ○')+' · 白贴 7.5';
  $('battleMoveCount').textContent='已下 '+game.moves.length+' 手';$('battleCaptures').textContent='提子 ● '+game.captures[1]+' / ○ '+game.captures[2];
  $('battle').setAttribute('data-phase',phase);
- for(const el of document.querySelectorAll('[data-difficulty]')){const yes=Number(el.dataset.difficulty)===difficulty;el.classList.toggle('active',yes);el.setAttribute('aria-pressed',String(yes));el.disabled=phase!=='playing';}
+ for(const el of document.querySelectorAll('[data-difficulty]')){const yes=Number(el.dataset.difficulty)===difficulty;el.classList.toggle('active',yes);el.setAttribute('aria-pressed',String(yes));el.disabled=mode==='local'||phase!=='playing';}
  $('battleJudging').hidden=phase!=='judging';$('battlePlay').hidden=phase!=='playing';$('battleScoring').hidden=phase!=='scoring';$('battleResult').hidden=phase!=='finished';
  $('battleUndo').disabled=!canUndo();for(const key of ['battleHint','battlePass'])$(key).disabled=busy||game.turn!==human||phase!=='playing';
  $('battleScore').disabled=busy||game.turn!==human||!game.moves.length;
