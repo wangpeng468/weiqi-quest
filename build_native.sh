@@ -4,6 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 : "${ANDROID_JAR:?Set ANDROID_JAR to an Android API 33+ platform android.jar}"
 : "${D8_JAR:?Set D8_JAR to the R8/D8 compiler jar}"
+python3 scripts/generate_sfx.py
 mkdir -p build/classes build/dex
 find build/classes -name '*.class' -delete
 javac --release 8 -encoding UTF-8 -cp "$ANDROID_JAR" -d build/classes src/org/weiqi/memory/MainActivity.java
