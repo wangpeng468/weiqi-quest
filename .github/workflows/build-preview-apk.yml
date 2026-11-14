@@ -70,7 +70,7 @@ jobs:
             "PACKAGE='org.weiqi.memory';VERSION=":"PACKAGE='org.weiqi.memory.preview';VERSION=",
             "aa('name',3,'.MainActivity')":"aa('name',3,'org.weiqi.memory.MainActivity')",
             "aa('label',3,'围棋背谱闯关')":"aa('label',3,'围棋背谱体验版')",
-            "OUTPUT=R/'dist'/'围棋背谱闯关_双人音效版_v2.9.1.apk'":"OUTPUT=R/'dist'/'weiqi-quest-v2.9.1-preview.apk'",
+            "OUTPUT=R/'dist'/'围棋背谱闯关_原生音效修复版_v2.9.2.apk'":"OUTPUT=R/'dist'/'weiqi-quest-v2.9.2-preview.apk'",
           }
           for original, replacement in changes.items():
             if s.count(original)!=1:
@@ -91,22 +91,36 @@ jobs:
       - name: Validate preview APK with Android platform verifier
         run: |
           set -euo pipefail
-          "$APKSIGNER" verify --verbose --min-sdk-version 26 dist/weiqi-quest-v2.9.1-preview.apk
+          "$APKSIGNER" verify --verbose --min-sdk-version 26 dist/weiqi-quest-v2.9.2-preview.apk
           python - <<'PY'
           from pathlib import Path
           from zipfile import ZipFile
           import hashlib, json
           from package_apk import verify_v2
-          apk=Path('dist/weiqi-quest-v2.9.1-preview.apk')
+          apk=Path('dist/weiqi-quest-v2.9.2-preview.apk')
           info=json.loads(Path('build-info.json').read_text())
           assert info['package']=='org.weiqi.memory.preview'
-          assert info['version']=='2.9.1' and info['versionCode']==20901
+          assert info['version']=='2.9.1' and info['versionCode']==20902
           assert info['requestedPermissions']==[]
           assert verify_v2(apk.read_bytes())==info['certificateSha256']
           with ZipFile(apk) as z:
             assert z.testzip() is None
             names=set(z.namelist())
             assert 'classes.dex' in names
+            from zipfile import ZIP_STORED
+            from struct import unpack_from
+            sound_names=['stone','capture','correct','error','pass','undo','hint','mark','finish','toggle']
+            for sound in sound_names:
+              name='assets/sfx/'+sound+'.wav'
+              assert name in names, 'Missing native effect: '+name
+              wave=z.read(name)
+              assert wave[:4]==b'RIFF' and wave[8:12]==b'WAVE'
+              entry=z.getinfo(name)
+              assert entry.compress_type==ZIP_STORED
+              n,extra=unpack_from('<HH',apk.read_bytes(),entry.header_offset+26)
+              assert (entry.header_offset+30+n+extra)%4==0, 'Audio asset must be aligned'
+            assert b'playSound' in z.read('classes.dex')
+            assert b'setSoundEnabled' in z.read('classes.dex')
             assert len([x for x in names if x.startswith('assets/sgf/') and x.endswith('.sgf')])==420
             assert len([x for x in names if x.startswith('assets/audio/') and x.endswith('.mp3')])==570
             assert not any(x.endswith(('.pem','.jks','.der','.keystore')) for x in names)
@@ -116,9 +130,9 @@ jobs:
       - name: Upload signed preview APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: weiqi-quest-v2.9.1-preview-apk
+          name: weiqi-quest-v2.9.2-preview-apk
           path: |
-            dist/weiqi-quest-v2.9.1-preview.apk
+            dist/weiqi-quest-v2.9.2-preview.apk
             build-info.json
           if-no-files-found: error
           retention-days: 30
@@ -128,26 +142,26 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          tag=v2.9.1-preview.1
+          tag=v2.9.2-preview.1
           cat > /tmp/weiqi-preview-notes.md <<'EOF'
-          围棋背谱闯关 v2.9.1 — 双人同屏与独立音效开关体验版，离线可用。
+          围棋背谱闯关 v2.9.2 — 双人同屏与独立音效开关体验版，离线可用。
 
           注意：这是独立安装的预览应用，包名 org.weiqi.memory.preview。
           它使用新生成的临时签名，不会覆盖已有的正式版 org.weiqi.memory，也不会删除原版学习记录；
           但两个应用的记录彼此独立，不会自动同步。以后更新本体验版可能需要先卸载体验版。
 
-          包含 9/13/19 路双人对战、当局计分、独立双人战绩；新增右上角独立音效开关，落子、提子、错手、通关均有轻柔离线提示音。
+          包含 9/13/19 路双人对战、当局计分、独立双人战绩；新增右上角独立音效开关，落子、提子、错手、通关均有由 Android SoundPool 播放的离线 WAV 棋子与提示音。
           内置 548 关练习、420 个棋谱和 570 个离线语音文件。
 
           需要覆盖升级正式版、沿用原版进度，请提供原版签名私钥并按仓库的 GitHub APK 签名指南配置。
           不要为了安装体验版而卸载现有正式版。
           EOF
           if gh release view "$tag" >/dev/null 2>&1; then
-            gh release upload "$tag" dist/weiqi-quest-v2.9.1-preview.apk --clobber
+            gh release upload "$tag" dist/weiqi-quest-v2.9.2-preview.apk --clobber
           else
-            gh release create "$tag" dist/weiqi-quest-v2.9.1-preview.apk \
+            gh release create "$tag" dist/weiqi-quest-v2.9.2-preview.apk \
               --target "$GITHUB_SHA" \
-              --title "围棋背谱闯关 v2.9.1 · 独立音效体验版" \
+              --title "围棋背谱闯关 v2.9.2 · 原生音效修复体验版" \
               --notes-file /tmp/weiqi-preview-notes.md --prerelease
           fi
 
