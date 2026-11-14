@@ -31,7 +31,7 @@ while pos<len(mb):
   attrs.append((tag,aa))
  pos+=size
 manifest=next(a for tag,a in attrs if tag=='manifest');sdk=next(a for tag,a in attrs if tag=='uses-sdk');activity=next(a for tag,a in attrs if tag=='activity')
-assert manifest['versionName']=='2.8.0' and manifest['versionCode']==20800 and manifest['package']=='org.weiqi.memory';assert 'uses-permission' not in tags;assert activity['screenOrientation']==6
+assert manifest['versionName']=='2.9.0' and manifest['versionCode']==20900 and manifest['package']=='org.weiqi.memory';assert 'uses-permission' not in tags;assert activity['screenOrientation']==6
 js_paths=re.findall(r'<script src="([^"]+)"',z.read('assets/index.html').decode());assert all('assets/'+p in names for p in js_paths)
 report={'version':manifest['versionName'],'versionCode':manifest['versionCode'],'package':manifest['package'],'apkBytes':len(b),'sha256':hashlib.sha256(b).hexdigest(),'v2SignatureVerified':True,'sameCertificateAs261':True,'certificateSha256':cert,'requestedPermissions':[],'sdk':sdk,'orientation':'sensorLandscape','dexChecksums':'pass','old495VoiceClipsUnchanged':True,'old420SGFUnchanged':True,'totalAudioFiles':sum(n.endswith('.mp3') for n in names),'voiceKeys':len(voice),'allLocalAudioPathsPresentAndAligned':True,'privateKeysFontsAndModelsExcluded':True,'allScriptPathsPresent':True,'htmlBytes':len(z.read('assets/index.html')),'realAndroidTested':False}
 (R/'release-validation.json').write_text(json.dumps(report,ensure_ascii=False,indent=2));print(json.dumps(report,ensure_ascii=False,indent=2))
