@@ -97,11 +97,11 @@ jobs:
           from pathlib import Path
           from zipfile import ZipFile
           import hashlib, json
-          from package_apk import verify_v2
+          from package_apk import verify_v2, VERSION, VERSION_CODE
           apk=Path('dist/weiqi-quest-v2.9.3-preview.apk')
           info=json.loads(Path('build-info.json').read_text())
           assert info['package']=='org.weiqi.memory.preview'
-          assert info['version']=='2.9.2' and info['versionCode']==20903
+          assert info['version']==VERSION and info['versionCode']==VERSION_CODE
           assert info['requestedPermissions']==[]
           assert verify_v2(apk.read_bytes())==info['certificateSha256']
           with ZipFile(apk) as z:
