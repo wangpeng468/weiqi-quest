@@ -99,20 +99,29 @@ function render(){
  $('battle').setAttribute('data-phase',phase);
  for(const el of document.querySelectorAll('[data-difficulty]')){const yes=Number(el.dataset.difficulty)===difficulty;el.classList.toggle('active',yes);el.setAttribute('aria-pressed',String(yes));el.disabled=mode==='local'||phase!=='playing';}
  $('battleJudging').hidden=phase!=='judging';$('battlePlay').hidden=phase!=='playing';$('battleScoring').hidden=phase!=='scoring';$('battleResult').hidden=phase!=='finished';
- $('battleUndo').disabled=!canUndo();for(const key of ['battleHint','battlePass'])$(key).disabled=busy||game.turn!==human||phase!=='playing';
- $('battleScore').disabled=busy||game.turn!==human||!game.moves.length;
+ $('battleUndo').disabled=!canUndo();
+ $('battleHint').disabled=busy||mode==='ai'&&game.turn!==human||phase!=='playing';
+ $('battleHint').querySelector('span').textContent=mode==='local'?'▦':'💡';
+ $('battleHint').querySelector('b').textContent=mode==='local'?'看分数':'提示';
+ $('battleHint').setAttribute('data-say',mode==='local'?'对战算分':'对战提示');
+ $('battlePass').disabled=busy||mode==='ai'&&game.turn!==human||phase!=='playing';
+ $('battleScore').disabled=busy||mode==='ai'&&game.turn!==human||!game.moves.length;
  $('battleResign').disabled=phase!=='playing';
  if(phase==='judging')status('正在自动计算胜负…','自动判胜负中','◷');
  else if(phase==='scoring')status('请和家长一起检查死子。','对战标记死子','▦');
  else if(phase==='finished')status(result&&result.provisional?'估算结果已保存，可请家长复核。':'胜负已保存到记录。','对战结果已保存','✓');
+ else if(mode==='local')status('轮到'+(game.turn===1?'黑棋 ●':'白棋 ○')+'落子。',game.turn===1?'请下黑棋':'请下白棋',game.turn===1?'●':'○');
  else if(busy||game.turn!==human)status('电脑正在想…','电脑在想','◷');
  else status('轮到你了，放'+(human===1?'黑棋':'白棋')+'。',human===1?'请下黑棋':'请下白棋',human===1?'●':'○');
- $('battleTip').textContent=busy?'电脑正在选择落点。想改上一步，可以点“悔棋”。':game.moves.length===0?'先看棋盘，点击交叉点落子。':'圈点是刚刚落下的棋子。想改一改，就点“悔棋”。';
- const rows=history();$('battleRecord').textContent='本机已完成 '+rows.length+' 局 · 对局自动保存';
+ $('battleTip').textContent=mode==='local'?'两个人轮流落子；连续停手两次，自动结算本局。':busy?'电脑正在选择落点。想改上一步，可以点“悔棋”。':game.moves.length===0?'先看棋盘，点击交叉点落子。':'圈点是刚刚落下的棋子。想改一改，就点“悔棋”。';
+ $('battleDifficultyTip').hidden=mode==='local';
+ const live=$('battleLiveScore');live.hidden=mode!=='local'||phase!=='playing';
+ if(!live.hidden){const a=E.area(game.board,game.n);live.textContent='本局临时计分：● '+a.black+' 点 · ○ '+a.white+' + 7.5 点（待确认）';}
+ const rows=history().filter(x=>x.mode===mode);$('battleRecord').textContent='本机已完成 '+rows.length+' 局 · 对局自动保存';
  if(phase==='finished'&&result){
   const won=result.winner===human,draw=result.winner===0;
-  $('battleResultIcon').textContent=draw?'＝':won?'★':'♡';
-  $('battleResultTitle').textContent=(result.provisional?'估算：':'')+(draw?'这一局和棋':won?'你赢啦！':'电脑赢了，再加油！');
+  $('battleResultIcon').textContent=mode==='local'?(draw?'＝':result.winner===1?'●':'○'):draw?'＝':won?'★':'♡';
+  $('battleResultTitle').textContent=(result.provisional?'估算：':'')+(mode==='local'?(draw?'这一局和棋':result.winner===1?'黑棋胜！':'白棋胜！'):(draw?'这一局和棋':won?'你赢啦！':'电脑赢了，再加油！'));
   $('battleResultTitle').setAttribute('data-say',resultVoice(result));
   $('battleResultDetails').textContent=result.reason==='resign'?'认输结束，结果已记录。':('● '+Number(result.black)+' 点 · ○ '+Number(result.white)+' + '+Number(result.komi==null?7.5:result.komi)+' 点\n'+(draw?'双方分数相同。':(result.winner===1?'黑棋':'白棋')+'胜 '+Number(result.margin==null?Math.abs(result.black-result.white-7.5):result.margin)+' 点。'));
   $('battleResultDetails').textContent=$('battleResultDetails').textContent.replace(/\\n/g,'\n');
@@ -123,11 +132,11 @@ function render(){
  renderBoard();if(host)host.layout();
 }
 function point(event){const r=$('battleBoard').getBoundingClientRect(),g=geometry;if(!g||!r.width)return -2;const x=(event.clientX-r.left)/r.width*600,y=(event.clientY-r.top)/r.height*600,xx=Math.round((x-g.margin)/g.step),yy=Math.round((y-g.margin)/g.step);if(xx<0||yy<0||xx>=g.n||yy>=g.n||Math.abs(x-g.margin-xx*g.step)>g.step*.48||Math.abs(y-g.margin-yy*g.step)>g.step*.48)return -2;return yy*g.n+xx;}
-function boardClick(event){const p=point(event);if(p<0)return;if(phase==='scoring'){if(!game.board[p])return;const stones=E.group(game.board,p,game.n).stones;const remove=dead.indexOf(p)>=0;if(remove)dead=dead.filter(q=>stones.indexOf(q)<0);else dead=dead.concat(stones.filter(q=>dead.indexOf(q)<0));save();renderBoard();speak(remove?'取消死子标记':'已标记死子');return;}if(phase!=='playing')return;if(busy||game.turn!==human){speak('电脑在想');return;}apply(p,true);}
-function updateSetup(){for(const [selector,field] of [['[data-board-size]','n'],['[data-human]','human'],['[data-setup-difficulty]','difficulty']])for(const el of document.querySelectorAll(selector)){const value=Number(el.getAttribute(selector.slice(1,-1)));const selected=value===setup[field];el.classList.toggle('active',selected);el.setAttribute('aria-pressed',String(selected));}}
-function openSetup(){setup={n:game?game.n:9,human,difficulty};updateSetup();$('battleSetup').hidden=false;speak('设置新对局');}
+function boardClick(event){const p=point(event);if(p<0)return;if(phase==='scoring'){if(!game.board[p])return;const stones=E.group(game.board,p,game.n).stones;const remove=dead.indexOf(p)>=0;if(remove)dead=dead.filter(q=>stones.indexOf(q)<0);else dead=dead.concat(stones.filter(q=>dead.indexOf(q)<0));save();renderBoard();speak(remove?'取消死子标记':'已标记死子');return;}if(phase!=='playing')return;if(busy||mode==='ai'&&game.turn!==human){speak('电脑在想');return;}apply(p,true);}
+function updateSetup(){$('battleSetup').dataset.mode=setup.mode;for(const el of document.querySelectorAll('[data-opponent]')){const selected=el.dataset.opponent===setup.mode;el.classList.toggle('active',selected);el.setAttribute('aria-pressed',String(selected));}for(const [selector,field] of [['[data-board-size]','n'],['[data-human]','human'],['[data-setup-difficulty]','difficulty']])for(const el of document.querySelectorAll(selector)){const value=Number(el.getAttribute(selector.slice(1,-1)));const selected=value===setup[field];el.classList.toggle('active',selected);el.setAttribute('aria-pressed',String(selected));}}
+function openSetup(){setup={n:game?game.n:9,human,difficulty,mode};updateSetup();$('battleSetup').hidden=false;speak('设置新对局');}
 function info(title,body){$('battleInfoClose').setAttribute('data-say',document.body.dataset.page==='progress'?'返回记录':'返回对战');$('battleInfoTitle').textContent=title;$('battleInfoBody').innerHTML=body;$('battleInfo').hidden=false;}
-function exportSGF(){if(!game)return;const coords=p=>p<0?'':String.fromCharCode(97+p%game.n,97+Math.floor(p/game.n));let s='(;GM[1]FF[4]CA[UTF-8]SZ['+game.n+']KM[7.5]PB['+(human===1?'小棋手':'本地电脑')+']PW['+(human===2?'小棋手':'本地电脑')+']';if(result){s+='RE['+(result.winner===0?'0':(result.winner===1?'B':'W')+'+'+(result.reason==='resign'?'R':Math.abs(result.black-result.white-(result.komi==null?7.5:result.komi)) ))+']';if(result.provisional)s+='C[练习自动估算，死活未完全确认，结果需要复核。]';}for(const m of game.moves)s+=';'+(m.c===1?'B':'W')+'['+coords(m.p)+']';s+=')';host.download('围棋对战_'+new Date().toISOString().slice(0,10)+'.sgf',s,'application/x-go-sgf');}
+function exportSGF(){if(!game)return;const coords=p=>p<0?'':String.fromCharCode(97+p%game.n,97+Math.floor(p/game.n));let s='(;GM[1]FF[4]CA[UTF-8]SZ['+game.n+']KM[7.5]PB['+(mode==='local'?'黑棋':human===1?'小棋手':'本地电脑')+']PW['+(mode==='local'?'白棋':human===2?'小棋手':'本地电脑')+']';if(result){s+='RE['+(result.winner===0?'0':(result.winner===1?'B':'W')+'+'+(result.reason==='resign'?'R':Math.abs(result.black-result.white-(result.komi==null?7.5:result.komi)) ))+']';if(result.provisional)s+='C[练习自动估算，死活未完全确认，结果需要复核。]';}for(const m of game.moves)s+=';'+(m.c===1?'B':'W')+'['+coords(m.p)+']';s+=')';host.download('围棋对战_'+new Date().toISOString().slice(0,10)+'.sgf',s,'application/x-go-sgf');}
 
 function importProgress(incoming){
  host.getState().battleVoids=cleanVoids((host.getState().battleVoids||[]).concat(incoming.battleVoids||[]));
