@@ -39,6 +39,7 @@ function rebuildCatalog(){levels=makeCatalog([...docs.values()]);}
 function rec(id){return state.records[id]||{plays:0,passes:0,bestStars:0,bestAccuracy:0,lastAccuracy:0,lastErrors:0,lastHints:0,lastPlayed:'',totalMs:0};}
 function groupList(){return current?levels.filter(l=>l.group===current.level.group):[];}
 function nextLevel(){const a=groupList(),i=a.findIndex(l=>l.id===current?.level.id);return i>=0?a[i+1]:null;}
+function fx(name){if(window.SoundFX)SoundFX.play(name);}
 function setFeedback(msg='',kind=''){feedbackMessage=msg;feedbackKind=kind;$('feedback').textContent=msg;$('feedback').className='feedback'+(kind?' '+kind:'');}
 function stopAuto(){if(autoTimer){clearInterval(autoTimer);autoTimer=null;}$('autoPlay').textContent='▶ 自动';}
 function showTab(tab){stopAuto();if(window.GoBattle)GoBattle.leave();activeTab=tab;document.body.dataset.page=tab;const header=$('appHeader');if(tab==='practice'||tab==='battle'){$(tab).querySelector('.lesson-card').prepend(header);}else{document.body.insertBefore(header,$('storageWarning'));}document.querySelectorAll('.page').forEach(p=>p.hidden=p.id!==tab);document.querySelectorAll('[data-tab]').forEach(b=>{b.classList.toggle('active',b.dataset.tab===tab);b.setAttribute('aria-current',b.dataset.tab===tab?'page':'false');});if(tab==='battle'&&window.GoBattle)GoBattle.enter();if(tab==='levels')renderLevels();if(tab==='progress')renderProgress();if(tab==='library')renderLibrary();scheduleLayout();}
@@ -100,15 +101,15 @@ function startTraining(){
 function finish(){
  mode='complete';hintVisible=false;const total=current.end-current.start,accuracy=Math.round((total-bad.size)/total*1000)/10,stars=bad.size===0?3:accuracy>=80?2:1,r=rec(current.level.id);
  r.passes++;r.bestAccuracy=Math.max(r.bestAccuracy,accuracy);r.bestStars=Math.max(r.bestStars,stars);r.lastAccuracy=accuracy;r.lastErrors=errors;r.lastHints=hints.size;r.lastPlayed=new Date().toISOString();r.totalMs+=Math.min(Math.max(0,Date.now()-startedAt),3600000);state.records[current.level.id]=r;
- setFeedback(stars===3?'全部独立记住了，获得三星！':'已经摆完这关！再练一遍，就能记得更稳。','success');renderPractice();sessionSave();if(window.ButtonVoice)ButtonVoice.say('本关完成鼓励');
+ fx('finish');setFeedback(stars===3?'全部独立记住了，获得三星！':'已经摆完这关！再练一遍，就能记得更稳。','success');renderPractice();sessionSave();if(window.ButtonVoice)ButtonVoice.say('本关完成鼓励');
 }
 function attempt(p){
  if(!current||mode!=='training')return;const expected=current.game.moves[current.start+at];if(!expected)return;
- if(p>=0&&current.game.boards[current.start+at][p]){setFeedback('这个交叉点已经有棋子了，请选空点。');return;}
- if(p!==expected.p){errors++;bad.add(at);wrongPoint=p;setFeedback('这手与参考棋谱不同。再想一想，也可以看提示。','error');renderPractice();sessionSave();if(window.ButtonVoice&&Date.now()-lastWrongVoiceAt>1600){lastWrongVoiceAt=Date.now();ButtonVoice.say('落子再想想');}const id=current.level.id;setTimeout(()=>{if(current?.level.id===id){wrongPoint=-1;renderBoard();}},700);return;}
- at++;hintVisible=false;wrongPoint=-1;if(at===current.end-current.start)return finish();setFeedback('这一手记对了！继续下一手。','success');renderPractice();sessionSave();
+ if(p>=0&&current.game.boards[current.start+at][p]){setFeedback('这个交叉点已经有棋子了，请选空点。');fx('error');return;}
+ if(p!==expected.p){fx('error');errors++;bad.add(at);wrongPoint=p;setFeedback('这手与参考棋谱不同。再想一想，也可以看提示。','error');renderPractice();sessionSave();if(window.ButtonVoice&&Date.now()-lastWrongVoiceAt>1600){lastWrongVoiceAt=Date.now();ButtonVoice.say('落子再想想');}const id=current.level.id;setTimeout(()=>{if(current?.level.id===id){wrongPoint=-1;renderBoard();}},700);return;}
+ at++;hintVisible=false;wrongPoint=-1;if(at===current.end-current.start)return finish();fx(p<0?'pass':'correct');setFeedback('这一手记对了！继续下一手。','success');renderPractice();sessionSave();
 }
-function showHint(){if(mode!=='training'||!current)return;hints.add(at);bad.add(at);hintVisible=true;const p=current.game.moves[current.start+at].p;setFeedback(p<0?'下一手是“停一手”，点击下方的停一手按钮。':'绿色虚线圈就是下一手的位置。看清楚后，再自己落子。');renderPractice();sessionSave();}
+function showHint(){if(mode!=='training'||!current)return;fx('hint');hints.add(at);bad.add(at);hintVisible=true;const p=current.game.moves[current.start+at].p;setFeedback(p<0?'下一手是“停一手”，点击下方的停一手按钮。':'绿色虚线圈就是下一手的位置。看清楚后，再自己落子。');renderPractice();sessionSave();}
 function viewport(){
  const g=current.game,n=g.n;
  if(!zoom||n<=9||current.level.group==='classic')return {x0:0,y0:0,count:n};
