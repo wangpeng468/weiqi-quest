@@ -74,7 +74,7 @@
         return ((_a = el.querySelector('strong')) === null || _a === void 0 ? void 0 : _a.textContent) || ''; return el.getAttribute('data-say') || el.textContent || ''; }
     document.addEventListener('click', function (event) {
         var el = event.target.closest('button,summary,label.file-button,[data-read-name]');
-        if (!el || el === control || el.disabled || !enabled)
+        if (!el || el === control || el.id === 'soundToggle' || el.disabled || !enabled)
             return;
         var text = buttonText(el);
         if (!say(text) && (el.matches('.level-card') || el.hasAttribute('data-read-name')))

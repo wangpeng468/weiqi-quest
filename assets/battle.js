@@ -33,6 +33,8 @@ var __read = (this && this.__read) || function (o, n) {
     var host = null, game = null, human = 1, difficulty = 0, mode = 'ai', phase = 'playing', dead = [], result = null, id = '', updatedAt = '', active = false, busy = false, timer = null, ticket = 0, geometry = null, hint = -1, wrong = -1, dialogAction = null, setup = { n: 9, human: 1, difficulty: 0, mode: 'ai' }, recordsPage = 0, recordFilter = 'all';
     function speak(key) { if (window.ButtonVoice)
         ButtonVoice.say(key); }
+    function fx(name) { if (window.SoundFX)
+        SoundFX.play(name); }
     function stamp() { return new Date().toISOString(); }
     function save() { if (!host || !game)
         return; updatedAt = stamp(); host.getState().battle = { version: 1, n: game.n, human: human, difficulty: difficulty, mode: mode, phase: phase, dead: dead.slice(), result: result, id: id, updatedAt: updatedAt, passes: game.passes, moves: game.moves.map(function (m) { return ({ p: m.p, c: m.c }); }) }; host.save(); }
@@ -81,6 +83,7 @@ var __read = (this && this.__read) || function (o, n) {
             return false;
         var r = E.play(game, p);
         if (!r.ok) {
+            fx('error');
             wrong = p;
             var k = r.reason === 'occupied' ? '这里已经有棋子' : r.reason === 'suicide' ? '这里没有气' : r.reason === 'ko' ? '不能马上打劫' : '点交叉点';
             status(k, k, '!', 'error');
@@ -90,6 +93,7 @@ var __read = (this && this.__read) || function (o, n) {
         }
         hint = -1;
         wrong = -1;
+        fx(p < 0 ? 'pass' : r.captured && r.captured.length ? 'capture' : 'stone');
         if (game.passes >= 2) {
             autoFinish();
             return true;
@@ -241,6 +245,7 @@ var __read = (this && this.__read) || function (o, n) {
         if (!game || !r || [0, 1, 2].indexOf(r.winner) < 0)
             return;
         cancelAI();
+        fx('finish');
         result = r;
         phase = 'finished';
         var rows = history().filter(function (x) { return x.id !== id; }), date = stamp();
@@ -272,7 +277,7 @@ var __read = (this && this.__read) || function (o, n) {
         scheduleAI();
     }
     function undo() { if (!canUndo())
-        return; cancelAI(); game = mode === 'local' ? E.rebuild(game.n, game.moves.slice(0, -1)) : E.undo(game, human); hint = -1; wrong = -1; dead = []; save(); render(); speak('对战悔棋完成'); scheduleAI(); }
+        return; cancelAI(); fx('undo'); game = mode === 'local' ? E.rebuild(game.n, game.moves.slice(0, -1)) : E.undo(game, human); hint = -1; wrong = -1; dead = []; save(); render(); speak('对战悔棋完成'); scheduleAI(); }
     function suggest() { if (!game || phase !== 'playing' || busy || mode === 'local' || game.turn !== human)
         return; hint = E.choose(game, 2, function () { return .5; }); wrong = -1; renderBoard(); if (hint < 0) {
         status('没有合适的落点，可以停一手。', '提示停一手', '✋');
@@ -448,6 +453,7 @@ var __read = (this && this.__read) || function (o, n) {
             dead = dead.filter(function (q) { return stones_1.indexOf(q) < 0; });
         else
             dead = dead.concat(stones_1.filter(function (q) { return dead.indexOf(q) < 0; }));
+        fx('mark');
         save();
         renderBoard();
         speak(remove ? '取消死子标记' : '已标记死子');

@@ -340,6 +340,8 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     function rec(id) { return state.records[id] || { plays: 0, passes: 0, bestStars: 0, bestAccuracy: 0, lastAccuracy: 0, lastErrors: 0, lastHints: 0, lastPlayed: '', totalMs: 0 }; }
     function groupList() { return current ? levels.filter(function (l) { return l.group === current.level.group; }) : []; }
     function nextLevel() { var a = groupList(), i = a.findIndex(function (l) { return l.id === (current === null || current === void 0 ? void 0 : current.level.id); }); return i >= 0 ? a[i + 1] : null; }
+    function fx(name) { if (window.SoundFX)
+        SoundFX.play(name); }
     function setFeedback(msg, kind) {
         if (msg === void 0) { msg = ''; }
         if (kind === void 0) { kind = ''; }
@@ -548,6 +550,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
         r.lastPlayed = new Date().toISOString();
         r.totalMs += Math.min(Math.max(0, Date.now() - startedAt), 3600000);
         state.records[current.level.id] = r;
+        fx('finish');
         setFeedback(stars === 3 ? '全部独立记住了，获得三星！' : '已经摆完这关！再练一遍，就能记得更稳。', 'success');
         renderPractice();
         sessionSave();
@@ -562,9 +565,11 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
             return;
         if (p >= 0 && current.game.boards[current.start + at][p]) {
             setFeedback('这个交叉点已经有棋子了，请选空点。');
+            fx('error');
             return;
         }
         if (p !== expected.p) {
+            fx('error');
             errors++;
             bad.add(at);
             wrongPoint = p;
@@ -587,12 +592,13 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
         wrongPoint = -1;
         if (at === current.end - current.start)
             return finish();
+        fx(p < 0 ? 'pass' : 'correct');
         setFeedback('这一手记对了！继续下一手。', 'success');
         renderPractice();
         sessionSave();
     }
     function showHint() { if (mode !== 'training' || !current)
-        return; hints.add(at); bad.add(at); hintVisible = true; var p = current.game.moves[current.start + at].p; setFeedback(p < 0 ? '下一手是“停一手”，点击下方的停一手按钮。' : '绿色虚线圈就是下一手的位置。看清楚后，再自己落子。'); renderPractice(); sessionSave(); }
+        return; fx('hint'); hints.add(at); bad.add(at); hintVisible = true; var p = current.game.moves[current.start + at].p; setFeedback(p < 0 ? '下一手是“停一手”，点击下方的停一手按钮。' : '绿色虚线圈就是下一手的位置。看清楚后，再自己落子。'); renderPractice(); sessionSave(); }
     function viewport() {
         var g = current.game, n = g.n;
         if (!zoom || n <= 9 || current.level.group === 'classic')
