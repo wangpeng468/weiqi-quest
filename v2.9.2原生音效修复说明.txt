@@ -1,0 +1,30 @@
+围棋背谱闯关 v2.9.2 — 安卓原生音效修复
+
+问题：部分安卓平板上语音正常，但音效开启后没有声音。此前语音通过 Android MediaPlayer 原生播放，音效却由 WebView Web Audio 合成。Web Audio 在不同 WebView/系统环境中的兼容表现不一致，因此即使界面显示音效已开启，也可能无声。
+
+修复内容：
+1. 在 Android MainActivity 增加独立 SoundPool 短音效播放器，与 MP3 语音 MediaPlayer 分开。
+2. 打包时用 scripts/generate_sfx.py 离线、确定性生成 10 段 24kHz/16bit/单声道 WAV；
+   按 APK 存储、不压缩、4 字节对齐，可由 Android AssetManager.openFd 直接读取。
+3. 页面 sfx.js 优先调用 GoAndroid.playSound(name)；不存在原生桥的浏览器才使用 Web Audio 后备。
+4. 原生音效名称仅接受预定义白名单；完全离线，无 IN­TERNET 权限或网络依赖。
+5. 开关调用 GoAndroid.setSoundEnabled，关闭后可即时停止当前短音效；
+   状态继续独立保存于本机，不影响普通话 B 音色语音。
+6. Android onPause/onDestroy 及时停止或释放播放器，避免后台发声和资源泄露。
+
+10 种音效：落子 stone、提子 capture、正确复摆 correct、错误 error、
+停一手 pass、悔棋 undo、提示 hint、标记死子 mark、胜负完成 finish、开关试听 toggle。
+不会增加背景音乐。保持原有横屏右侧工具栏，棋盘上方不添加按钮。
+
+打包和升级：
+包名依旧 org.weiqi.memory，Android 版本 2.9.2 / versionCode 20902。
+原签名 PEM/DER 文件必须只保存在个人私有空间，不能提交公开仓库。
+build_native.sh 会自动生成 WAV 并编译 Java、DEX，package_apk.py 会验证 WAV 存在并以 STORED 模式打包。
+使用 GitHub Actions 可对独立安装体验版进行平台 apksigner 验证；
+与旧版原签名相同的正式包可在本地使用个人私钥签名，避免公开仓库泄漏密钥。
+升级前请通过“备份记录”导出 JSON，安装时不要先卸载旧版。
+原版和体验版包名不同，数据不会互相同步。
+
+测试：node test_sfx.cjs、node test_two_player.cjs、node test_battle_rules.cjs、
+node test_auto_scoring.cjs、GitHub Actions Android javac/D8/apksigner + WAV 格式、存储与对齐校验。
+仍需在用户的实际安卓平板上试听音量、音效独立控制和覆盖安装体验。
