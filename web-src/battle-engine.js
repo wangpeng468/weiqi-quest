@@ -162,7 +162,7 @@ function autoScore(state,options={}){
 function restore(raw){
  if(!raw||raw.version!==1||[9,13,19].indexOf(raw.n)<0||[1,2].indexOf(raw.human)<0||!Array.isArray(raw.moves)||raw.moves.length>3000)return null;
  try{const game=rebuild(raw.n,raw.moves);if(raw.phase==='playing')game.passes=Math.min(2,Math.max(0,Number(raw.passes)||0));
-  return {game,human:raw.human,difficulty:[0,1,2].indexOf(raw.difficulty)>=0?raw.difficulty:1,phase:['playing','scoring','finished','judging'].indexOf(raw.phase)>=0?raw.phase:'playing',dead:Array.isArray(raw.dead)?raw.dead.filter(p=>Number.isInteger(p)&&p>=0&&p<game.board.length&&game.board[p]):[],result:raw.result&&typeof raw.result==='object'?raw.result:null,id:typeof raw.id==='string'?raw.id.slice(0,80):'game-'+Date.now(),updatedAt:typeof raw.updatedAt==='string'?raw.updatedAt:''};
+  return {game,human:raw.human,mode:raw.mode==='local'?'local':'ai',difficulty:[0,1,2].indexOf(raw.difficulty)>=0?raw.difficulty:1,phase:['playing','scoring','finished','judging'].indexOf(raw.phase)>=0?raw.phase:'playing',dead:Array.isArray(raw.dead)?raw.dead.filter(p=>Number.isInteger(p)&&p>=0&&p<game.board.length&&game.board[p]):[],result:raw.result&&typeof raw.result==='object'?raw.result:null,id:typeof raw.id==='string'?raw.id.slice(0,80):'game-'+Date.now(),updatedAt:typeof raw.updatedAt==='string'?raw.updatedAt:''};
  }catch(e){return null;}
 }
 const api={adjacent,key,group,analyse,tryMove,create,play,rebuild,undo,area,eye,candidates,choose,restore,passAlive,localCapture,autoScore};root.BattleEngine=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
