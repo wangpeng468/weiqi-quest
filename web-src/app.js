@@ -215,6 +215,8 @@ function bindEvents(){
  for(const id of ['levelGrid','recentList'])$(id).onclick=e=>{const b=e.target.closest('[data-level]');if(b)safeLoadLevel(b.dataset.level);};
  $('continueLast').onclick=()=>loadLevel(state.lastId,{resume:true});$('randomReview').onclick=()=>{const cat=$('categoryFilter').value,a=levels.filter(l=>rec(l.id).passes&&(cat==='all'||l.group===cat));if(!a.length)return toast('当前分类还没有通关关卡，先完成一关吧。');loadLevel(a[Math.floor(Math.random()*a.length)].id);};
  $('sgfFiles').onchange=async e=>{await importFiles([...e.target.files]);e.target.value='';};$('importText').onclick=async()=>{try{const r=await importSGF($('sgfText').value,$('sgfTitle').value.trim());$('importStatus').textContent=(r.existed?'这个棋谱已存在，保留原有记录。':'导入成功。')+'共有 '+r.levels+' 个分段关卡。';renderLibrary();$('categoryFilter').value='imported';page=0;toast('已加入“我的棋谱”。');}catch(e){$('importStatus').textContent='导入失败：'+e.message;}};
+ $('appAboutButton').onclick=()=>{$('appAboutDialog').hidden=false;$('closeAppAbout').focus({preventScroll:true});};
+ $('closeAppAbout').onclick=()=>{$('appAboutDialog').hidden=true;$('appAboutButton').focus({preventScroll:true});};
  $('exportBackup').onclick=exportBackup;$('backupTop').onclick=exportBackup;$('backupFile').onchange=async e=>{if(e.target.files[0])await importBackup(e.target.files[0]);e.target.value='';};$('exportOffline').onclick=exportOffline;
 
  $('previousLevel').onclick=()=>{const a=groupList(),i=a.findIndex(l=>l.id===current?.level.id);if(i>0)safeLoadLevel(a[i-1].id);};
@@ -222,7 +224,7 @@ function bindEvents(){
  $('lessonHelp').onclick=()=>{stopAuto();$('lessonHelpDialog').hidden=false;$('closeLessonHelp').focus({preventScroll:true});};
  $('closeLessonHelp').onclick=()=>{$('lessonHelpDialog').hidden=true;$('lessonHelp').focus({preventScroll:true});};
  $('confirmStay').onclick=closeConfirm;$('confirmGo').onclick=()=>{const action=confirmAction;closeConfirm();if(action)action();};
- document.addEventListener('keydown',e=>{if(e.key==='Escape'){$('lessonHelpDialog').hidden=true;closeConfirm();}});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'){$('appAboutDialog').hidden=true;$('lessonHelpDialog').hidden=true;closeConfirm();}});
  window.addEventListener('resize',scheduleLayout);window.addEventListener('orientationchange',scheduleLayout);if(window.visualViewport)window.visualViewport.addEventListener('resize',scheduleLayout);
  if(window.ResizeObserver){const ro=new ResizeObserver(scheduleLayout);ro.observe(document.querySelector('.board-stage'));ro.observe($('levelGrid'));}
 
