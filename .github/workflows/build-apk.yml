@@ -83,10 +83,9 @@ jobs:
           PY
 
       - name: Compile native shell and sign APK
-        env:
-          ANDROID_JAR: ${{ env.ANDROID_HOME }}/platforms/android-34/android.jar
-          D8_JAR: ${{ env.ANDROID_HOME }}/build-tools/34.0.0/lib/d8.jar
         run: |
+          export ANDROID_JAR="$ANDROID_HOME/platforms/android-34/android.jar"
+          export D8_JAR="$ANDROID_HOME/build-tools/34.0.0/lib/d8.jar"
           test -f "$ANDROID_JAR"
           test -f "$D8_JAR"
           bash build_native.sh
