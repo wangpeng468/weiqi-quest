@@ -1,0 +1,155 @@
+name: Build installable two-player preview APK
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/build-preview-apk.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  preview:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - name: Check out current app
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Restore all offline games and voice clips
+        run: python scripts/unpack_resources.py
+
+      - name: Compile web code and run two-player tests
+        run: |
+          npm install --no-audit --no-fund
+          npm run web
+          node test_battle_rules.cjs
+          node test_auto_scoring.cjs
+          node test_two_player.cjs
+
+      - name: Locate preinstalled Android SDK and D8
+        shell: bash
+        run: |
+          set -euo pipefail
+          sdk="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          android_jar="$(find "$sdk/platforms" -mindepth 2 -maxdepth 2 -name android.jar -type f 2>/dev/null | grep -E '/android-(3[4-9]|[4-9][0-9])/android.jar$' | sort -V | tail -n1 || true)"
+          d8_jar="$(find "$sdk/build-tools" -mindepth 3 -maxdepth 3 -name d8.jar -type f 2>/dev/null | sort -V | tail -n1 || true)"
+          apksigner="$(find "$sdk/build-tools" -mindepth 2 -maxdepth 2 -name apksigner -type f 2>/dev/null | sort -V | tail -n1 || true)"
+          test -f "$android_jar" && test -f "$d8_jar" && test -f "$apksigner"
+          printf 'ANDROID_JAR=%s\nD8_JAR=%s\nAPKSIGNER=%s\n' "$android_jar" "$d8_jar" "$apksigner" >> "$GITHUB_ENV"
+
+      - name: Install Python APK dependencies
+        run: python -m pip install 'cryptography>=41' 'cairosvg>=2.7'
+
+      - name: Make safe side-by-side preview package
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('package_apk.py')
+          s=p.read_text()
+          changes={
+            "PACKAGE='org.weiqi.memory';VERSION=":"PACKAGE='org.weiqi.memory.preview';VERSION=",
+            "aa('name',3,'.MainActivity')":"aa('name',3,'org.weiqi.memory.MainActivity')",
+            "aa('label',3,'围棋背谱闯关')":"aa('label',3,'围棋背谱体验版')",
+            "OUTPUT=R/'dist'/'围棋背谱闯关_双人对战版_v2.9.0.apk'":"OUTPUT=R/'dist'/'weiqi-quest-v2.9.0-preview.apk'",
+          }
+          for original, replacement in changes.items():
+            if s.count(original)!=1:
+              raise SystemExit('Preview patch did not match expected source: '+original)
+            s=s.replace(original,replacement)
+          p.write_text(s)
+          assert not Path('private-signing').exists(), 'Private signing files must never come from the public repository'
+          print('Preview uses separate Android package org.weiqi.memory.preview and a new temporary signing identity.')
+          PY
+
+      - name: Build and sign installable APK
+        env:
+          ALLOW_NEW_SIGNING_KEY: '1'
+        run: |
+          umask 077
+          bash build_native.sh
+
+      - name: Validate preview APK with Android platform verifier
+        run: |
+          set -euo pipefail
+          "$APKSIGNER" verify --verbose --min-sdk-version 26 dist/weiqi-quest-v2.9.0-preview.apk
+          python - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile
+          import hashlib, json
+          from package_apk import verify_v2
+          apk=Path('dist/weiqi-quest-v2.9.0-preview.apk')
+          info=json.loads(Path('build-info.json').read_text())
+          assert info['package']=='org.weiqi.memory.preview'
+          assert info['version']=='2.9.0' and info['versionCode']==20900
+          assert info['requestedPermissions']==[]
+          assert verify_v2(apk.read_bytes())==info['certificateSha256']
+          with ZipFile(apk) as z:
+            assert z.testzip() is None
+            names=set(z.namelist())
+            assert 'classes.dex' in names
+            assert len([x for x in names if x.startswith('assets/sgf/') and x.endswith('.sgf')])==420
+            assert len([x for x in names if x.startswith('assets/audio/') and x.endswith('.mp3')])==570
+            assert not any(x.endswith(('.pem','.jks','.der','.keystore')) for x in names)
+          print('APK ready; bytes:', apk.stat().st_size, 'SHA-256:', hashlib.sha256(apk.read_bytes()).hexdigest())
+          PY
+
+      - name: Upload signed preview APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: weiqi-quest-v2.9.0-preview-apk
+          path: |
+            dist/weiqi-quest-v2.9.0-preview.apk
+            build-info.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish easy-download preview release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag=v2.9.0-preview.1
+          cat > /tmp/weiqi-preview-notes.md <<'EOF'
+          围棋背谱闯关 v2.9.0 — 双人同屏体验版，离线可用。
+
+          注意：这是独立安装的预览应用，包名 org.weiqi.memory.preview。
+          它使用新生成的临时签名，不会覆盖已有的正式版 org.weiqi.memory，也不会删除原版学习记录；
+          但两个应用的记录彼此独立，不会自动同步。以后更新本体验版可能需要先卸载体验版。
+
+          新增 9/13/19 路双人对战、当局估算计分、自动结算、死子复核、独立双人战绩。
+          内置 548 关练习、420 个棋谱和 570 个离线语音文件。
+
+          需要覆盖升级正式版、沿用原版进度，请提供原版签名私钥并按仓库的 GitHub APK 签名指南配置。
+          不要为了安装体验版而卸载现有正式版。
+          EOF
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" dist/weiqi-quest-v2.9.0-preview.apk --clobber
+          else
+            gh release create "$tag" dist/weiqi-quest-v2.9.0-preview.apk \
+              --target "$GITHUB_SHA" \
+              --title "围棋背谱闯关 v2.9.0 · 双人对战体验版" \
+              --notes-file /tmp/weiqi-preview-notes.md --prerelease
+          fi
+
+      - name: Remove temporary signing identity
+        if: always()
+        run: rm -rf private-signing
