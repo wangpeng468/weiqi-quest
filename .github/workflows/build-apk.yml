@@ -45,6 +45,7 @@ jobs:
           node test_battle_rules.cjs
           node test_auto_scoring.cjs
           node test_two_player.cjs
+          node test_sfx.cjs
 
       # The hosted runner already has an SDK; avoid obsolete sdkmanager "tools".
       - name: Locate preinstalled Android SDK
