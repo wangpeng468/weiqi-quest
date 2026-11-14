@@ -161,7 +161,7 @@ function renderRecords(){
  $('progressTitle').textContent=isLocal?'双人对战记录':isBattle?'我的人机对战记录':'我的闯关记录';
  $('progressDescription').textContent=isLocal?'两人同屏对战 · 分别记录黑棋、白棋的胜负和分数。':isBattle?'与电脑对战的输赢记录，与双人对局分开保存。':'保留最佳成绩、挑战次数、通关次数和最近练习时间。';
  const all=history().filter(r=>r.mode===(isLocal?'local':'ai')),stat=summary(all);
- const winButton=$('[data-record-filter="win"]'),lossButton=$('[data-record-filter="loss"]');
+ const winButton=document.querySelector('[data-record-filter="win"]'),lossButton=document.querySelector('[data-record-filter="loss"]');
  winButton.textContent=isLocal?'● 黑棋胜':'★ 赢了';winButton.setAttribute('data-say',isLocal?'黑棋先走':'只看获胜');
  lossButton.textContent=isLocal?'○ 白棋胜':'♡ 再加油';lossButton.setAttribute('data-say',isLocal?'白棋后走':'只看再加油');
  $('battleRecordMetrics').innerHTML=(isLocal?[[stat.win,'● 黑棋胜'],[stat.loss,'○ 白棋胜'],[stat.draw,'＝ 和棋'],[stat.provisional,'ⓘ 估算']]:[[stat.win,'★ 赢了'],[stat.loss,'♡ 再加油'],[stat.draw,'＝ 和棋'],[stat.total?stat.rate+'%':'—','胜率']]).map(([v,t])=>'<div><b>'+v+'</b><small>'+t+'</small></div>').join('');
