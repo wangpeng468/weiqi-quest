@@ -14,7 +14,7 @@ control.addEventListener('click',()=>setEnabled(!enabled));
 function buttonText(el){if(el.matches('.level-card'))return el.querySelector('strong')?.textContent||'';return el.getAttribute('data-say')||el.textContent||'';}
 document.addEventListener('click',event=>{
  const el=event.target.closest('button,summary,label.file-button,[data-read-name]');
- if(!el||el===control||el.disabled||!enabled)return;
+ if(!el||el===control||el.id==='soundToggle'||el.disabled||!enabled)return;
  const text=buttonText(el);
  if(!say(text)&&(el.matches('.level-card')||el.hasAttribute('data-read-name')))say('打开棋谱');
 },true);
