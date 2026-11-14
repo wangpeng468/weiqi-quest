@@ -32,12 +32,6 @@ jobs:
           distribution: temurin
           java-version: '21'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install Android build tools
-        run: sdkmanager --install 'platforms;android-34' 'build-tools;34.0.0'
-
       - name: Restore and verify bundled offline assets
         run: python scripts/unpack_resources.py
 
@@ -51,6 +45,27 @@ jobs:
           node test_battle_rules.cjs
           node test_auto_scoring.cjs
           node test_two_player.cjs
+
+      # The hosted runner already has an SDK; avoid obsolete sdkmanager "tools".
+      - name: Locate preinstalled Android SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          sdk="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          if [[ ! -d "$sdk" ]]; then
+            echo "::error::Android SDK directory not found: $sdk"
+            exit 1
+          fi
+          android_jar="$(find "$sdk/platforms" -mindepth 2 -maxdepth 2 -name android.jar -type f 2>/dev/null | grep -E '/android-(3[4-9]|[4-9][0-9])/android.jar$' | sort -V | tail -n1 || true)"
+          d8_jar="$(find "$sdk/build-tools" -mindepth 3 -maxdepth 3 -name d8.jar -type f 2>/dev/null | sort -V | tail -n1 || true)"
+          if [[ ! -f "$android_jar" || ! -f "$d8_jar" ]]; then
+            echo "::error::Android API 34+ or D8 compiler missing from the runner image."
+            find "$sdk/platforms" "$sdk/build-tools" -maxdepth 2 -mindepth 1 -type d 2>/dev/null || true
+            exit 1
+          fi
+          printf 'ANDROID_JAR=%s\nD8_JAR=%s\n' "$android_jar" "$d8_jar" >> "$GITHUB_ENV"
+          echo "Android SDK: $android_jar"
+          echo "D8 compiler: $d8_jar"
 
       - name: Install APK tooling
         run: python -m pip install 'cryptography>=41' 'cairosvg>=2.7'
@@ -90,8 +105,6 @@ jobs:
 
       - name: Compile native shell and sign APK
         run: |
-          export ANDROID_JAR="$ANDROID_HOME/platforms/android-34/android.jar"
-          export D8_JAR="$ANDROID_HOME/build-tools/34.0.0/lib/d8.jar"
           test -f "$ANDROID_JAR"
           test -f "$D8_JAR"
           bash build_native.sh
