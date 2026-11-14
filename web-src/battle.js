@@ -5,6 +5,7 @@
 const E=window.BattleEngine,$=id=>document.getElementById(id),labels=['轻松','认真','挑战'];
 let host=null,game=null,human=1,difficulty=0,mode='ai',phase='playing',dead=[],result=null,id='',updatedAt='',active=false,busy=false,timer=null,ticket=0,geometry=null,hint=-1,wrong=-1,dialogAction=null,setup={n:9,human:1,difficulty:0,mode:'ai'},recordsPage=0,recordFilter='all';
 function speak(key){if(window.ButtonVoice)ButtonVoice.say(key);}
+function fx(name){if(window.SoundFX)SoundFX.play(name);}
 function stamp(){return new Date().toISOString();}
 function save(){if(!host||!game)return;updatedAt=stamp();host.getState().battle={version:1,n:game.n,human,difficulty,mode,phase,dead:dead.slice(),result,id,updatedAt,passes:game.passes,moves:game.moves.map(m=>({p:m.p,c:m.c}))};host.save();}
 function cancelAI(){ticket++;clearTimeout(timer);timer=null;busy=false;}
@@ -21,8 +22,8 @@ function scheduleAI(){
 }
 function apply(p,isHuman){
  if(!game||phase!=='playing'||mode==='local'&&!isHuman||(isHuman&&(busy||mode==='ai'&&game.turn!==human)))return false;
- const r=E.play(game,p);if(!r.ok){wrong=p;const k=r.reason==='occupied'?'这里已经有棋子':r.reason==='suicide'?'这里没有气':r.reason==='ko'?'不能马上打劫':'点交叉点';status(k,k,'!','error');speak(k);renderBoard();return false;}
- hint=-1;wrong=-1;
+ const r=E.play(game,p);if(!r.ok){fx('error');wrong=p;const k=r.reason==='occupied'?'这里已经有棋子':r.reason==='suicide'?'这里没有气':r.reason==='ko'?'不能马上打劫':'点交叉点';status(k,k,'!','error');speak(k);renderBoard();return false;}
+ hint=-1;wrong=-1;fx(p<0?'pass':r.captured&&r.captured.length?'capture':'stone');
  if(game.passes>=2){autoFinish();return true;}
  save();render();
  if(mode==='local'){if(active)speak(game.turn===1?'请下黑棋':'请下白棋');}else if(isHuman)scheduleAI();else if(p<0){status('电脑停一手，轮到你了。','电脑停一手','✋');speak('电脑停一手');}else if(active)speak('轮到你了');
@@ -55,7 +56,7 @@ function cleanVoids(a){const m={};for(const x of Array.isArray(a)?a.slice(0,1000
 function syncRows(rows){const v={};for(const x of cleanVoids(host.getState().battleVoids))v[x.id]=x.date;host.getState().battleHistory=cleanHistory(rows).filter(x=>!v[x.id]||x.updatedAt>v[x.id]);}
 function resultVoice(r){if(mode==='local')return r.winner===0?'对战和棋':'对战结果已保存';return r.provisional?(r.winner===0?'估算和棋':r.winner===human?'估算你赢了':'估算电脑赢了'):(r.winner===0?'对战和棋':r.winner===human?'对战赢了':'对战结束鼓励');}
 function finish(r){
- if(!game||!r||[0,1,2].indexOf(r.winner)<0)return;cancelAI();result=r;phase='finished';
+ if(!game||!r||[0,1,2].indexOf(r.winner)<0)return;cancelAI();fx('finish');result=r;phase='finished';
  const rows=history().filter(x=>x.id!==id),date=stamp();
  rows.unshift({id,date,updatedAt:date,n:game.n,mode,human,difficulty,moves:game.moves.length,winner:r.winner,reason:r.reason,method:r.method||'manual',provisional:!!r.provisional,black:r.black,white:r.white,komi:r.komi,margin:r.margin,autoDead:r.autoDead||0,unsettledGroups:r.unsettledGroups||0});
  host.getState().battleVoids=cleanVoids(host.getState().battleVoids).filter(x=>x.id!==id);syncRows(rows);save();render();renderRecords();speak(resultVoice(r));
@@ -65,7 +66,7 @@ function resumeGame(){
  if(history().some(x=>x.id===id)){host.getState().battleHistory=history().filter(x=>x.id!==id);host.getState().battleVoids=cleanVoids((host.getState().battleVoids||[]).concat([{id,date:stamp()}]));}
  phase='playing';result=null;game.passes=0;dead=[];hint=-1;wrong=-1;save();render();renderRecords();scheduleAI();
 }
-function undo(){if(!canUndo())return;cancelAI();game=mode==='local'?E.rebuild(game.n,game.moves.slice(0,-1)):E.undo(game,human);hint=-1;wrong=-1;dead=[];save();render();speak('对战悔棋完成');scheduleAI();}
+function undo(){if(!canUndo())return;cancelAI();fx('undo');game=mode==='local'?E.rebuild(game.n,game.moves.slice(0,-1)):E.undo(game,human);hint=-1;wrong=-1;dead=[];save();render();speak('对战悔棋完成');scheduleAI();}
 function suggest(){if(!game||phase!=='playing'||busy||mode==='local'||game.turn!==human)return;hint=E.choose(game,2,()=>.5);wrong=-1;renderBoard();if(hint<0){status('没有合适的落点，可以停一手。','提示停一手','✋');speak('提示停一手');}else{speak('对战提示落点');}}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function renderBoard(){
@@ -132,7 +133,7 @@ function render(){
  renderBoard();if(host)host.layout();
 }
 function point(event){const r=$('battleBoard').getBoundingClientRect(),g=geometry;if(!g||!r.width)return -2;const x=(event.clientX-r.left)/r.width*600,y=(event.clientY-r.top)/r.height*600,xx=Math.round((x-g.margin)/g.step),yy=Math.round((y-g.margin)/g.step);if(xx<0||yy<0||xx>=g.n||yy>=g.n||Math.abs(x-g.margin-xx*g.step)>g.step*.48||Math.abs(y-g.margin-yy*g.step)>g.step*.48)return -2;return yy*g.n+xx;}
-function boardClick(event){const p=point(event);if(p<0)return;if(phase==='scoring'){if(!game.board[p])return;const stones=E.group(game.board,p,game.n).stones;const remove=dead.indexOf(p)>=0;if(remove)dead=dead.filter(q=>stones.indexOf(q)<0);else dead=dead.concat(stones.filter(q=>dead.indexOf(q)<0));save();renderBoard();speak(remove?'取消死子标记':'已标记死子');return;}if(phase!=='playing')return;if(busy||mode==='ai'&&game.turn!==human){speak('电脑在想');return;}apply(p,true);}
+function boardClick(event){const p=point(event);if(p<0)return;if(phase==='scoring'){if(!game.board[p])return;const stones=E.group(game.board,p,game.n).stones;const remove=dead.indexOf(p)>=0;if(remove)dead=dead.filter(q=>stones.indexOf(q)<0);else dead=dead.concat(stones.filter(q=>dead.indexOf(q)<0));fx('mark');save();renderBoard();speak(remove?'取消死子标记':'已标记死子');return;}if(phase!=='playing')return;if(busy||mode==='ai'&&game.turn!==human){speak('电脑在想');return;}apply(p,true);}
 function updateSetup(){$('battleSetup').dataset.mode=setup.mode;for(const el of document.querySelectorAll('[data-opponent]')){const selected=el.dataset.opponent===setup.mode;el.classList.toggle('active',selected);el.setAttribute('aria-pressed',String(selected));}for(const [selector,field] of [['[data-board-size]','n'],['[data-human]','human'],['[data-setup-difficulty]','difficulty']])for(const el of document.querySelectorAll(selector)){const value=Number(el.getAttribute(selector.slice(1,-1)));const selected=value===setup[field];el.classList.toggle('active',selected);el.setAttribute('aria-pressed',String(selected));}}
 function openSetup(){cancelAI();setup={n:game?game.n:9,human,difficulty,mode};updateSetup();$('battleSetup').hidden=false;speak('设置新对局');}
 function info(title,body){$('battleInfoClose').setAttribute('data-say',document.body.dataset.page==='progress'?'返回记录':'返回对战');$('battleInfoTitle').textContent=title;$('battleInfoBody').innerHTML=body;$('battleInfo').hidden=false;}
