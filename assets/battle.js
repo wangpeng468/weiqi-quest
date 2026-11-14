@@ -504,7 +504,7 @@ var __read = (this && this.__read) || function (o, n) {
             finally { if (e_9) throw e_9.error; }
         }
     }
-    function openSetup() { setup = { n: game ? game.n : 9, human: human, difficulty: difficulty, mode: mode }; updateSetup(); $('battleSetup').hidden = false; speak('设置新对局'); }
+    function openSetup() { cancelAI(); setup = { n: game ? game.n : 9, human: human, difficulty: difficulty, mode: mode }; updateSetup(); $('battleSetup').hidden = false; speak('设置新对局'); }
     function info(title, body) { $('battleInfoClose').setAttribute('data-say', document.body.dataset.page === 'progress' ? '返回记录' : '返回对战'); $('battleInfoTitle').textContent = title; $('battleInfoBody').innerHTML = body; $('battleInfo').hidden = false; }
     function exportSGF() {
         var e_11, _a;
@@ -661,10 +661,10 @@ var __read = (this && this.__read) || function (o, n) {
         $('battleCorrect').onclick = beginScoring;
         $('battleContinueAfter').onclick = function () { return ask('继续下这一局？', '会撤回本局的胜负记录，恢复下棋；下完后再结算。其他对局和闯关成绩不变。', '撤回结算说明', resumeGame, '▶ 继续下', '对战继续下棋'); };
         $('battleOpenRecords').onclick = showRecords;
-        $('battleDialogNo').onclick = closeDialog;
+        $('battleDialogNo').onclick = function () { closeDialog(); scheduleAI(); };
         $('battleDialogYes').onclick = function () { var action = dialogAction; closeDialog(); if (action)
             action(); };
-        $('battleSetupClose').onclick = function () { $('battleSetup').hidden = true; };
+        $('battleSetupClose').onclick = function () { $('battleSetup').hidden = true; scheduleAI(); };
         var _loop_2 = function (el) {
             el.onclick = function () { setup.mode = el.dataset.opponent; updateSetup(); };
         };
@@ -772,6 +772,7 @@ var __read = (this && this.__read) || function (o, n) {
         $('battleRecordsPrev').onclick = function () { recordsPage--; renderRecords(); };
         $('battleRecordsNext').onclick = function () { recordsPage++; renderRecords(); };
         $('battleRecordsPlay').onclick = function () { var want = host.getState().recordView === 'local' ? 'local' : 'ai'; host.showTab('battle'); if (mode !== want) {
+            cancelAI();
             setup = { n: game ? game.n : 9, human: human, difficulty: difficulty, mode: want };
             updateSetup();
             $('battleSetup').hidden = false;
