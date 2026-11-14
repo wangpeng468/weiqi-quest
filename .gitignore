@@ -22,3 +22,5 @@ __pycache__/
 # Restored binary assets live in resources/offline-assets.part*
 assets/audio/
 assets/sgf/
+# Regenerated offline SoundPool WAV cues
+assets/sfx/
