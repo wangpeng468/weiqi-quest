@@ -444,3 +444,16 @@ body.tablet-landscape[data-page="battle"] main{padding:8px;flex:1 1 auto;height:
  .record-toolbar button{min-height:40px;padding:3px 10px;}.record-pagination button{min-height:40px;}.record-medal{font-size:1.25rem;}
  .battle-result .result-title{min-height:40px;font-size:1rem;}.battle-result .two-buttons button{min-height:42px;}.battle-result>#battleReview{min-height:34px;}
 }
+
+/* v2.9: same-tablet two-player play, with a compact non-final live tally. */
+#battle[data-mode="local"] .battle-difficulty{display:none;}
+#battleSetup[data-mode="local"] .setup-ai-only{display:none;}
+.battle-live-score{font-size:.75rem!important;line-height:1.35!important;font-weight:650;color:#205c49!important;background:#ecf4eb;border-radius:8px;padding:6px 9px;margin:0;}
+.record-tabs button{flex:1;min-width:0;}
+@media(max-height:700px) and (orientation:landscape){
+ .battle-live-score{font-size:.68rem!important;padding:4px 7px;}
+}
+@media(max-height:520px) and (orientation:landscape){
+ .battle-live-score{font-size:.63rem!important;padding:2px 5px;}
+ .record-tabs button{font-size:.78rem;padding:3px 5px;}
+}
