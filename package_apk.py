@@ -10,8 +10,8 @@ from cryptography.x509.oid import NameOID
 P=lambda *v:struct.pack('<'+'I'*len(v),*v)
 H=lambda *v:struct.pack('<'+'H'*len(v),*v)
 R=Path(__file__).parent
-PACKAGE='org.weiqi.memory';VERSION='2.8.0';VERSION_CODE=20800
-OUTPUT=R/'dist'/'围棋背谱闯关_自动胜负版_v2.8.0.apk'
+PACKAGE='org.weiqi.memory';VERSION='2.9.0';VERSION_CODE=20900
+OUTPUT=R/'dist'/'围棋背谱闯关_双人对战版_v2.9.0.apk'
 U32=0xffffffff
 
 def chunk(t,h,p=b''):return H(t,8+len(h))+P(8+len(h)+len(p))+h+p
