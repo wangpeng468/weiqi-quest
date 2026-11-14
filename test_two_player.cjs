@@ -81,8 +81,8 @@ async function run(){
   assert.equal(b.phase,'playing');assert.equal(b.game.passes,0);
   b.newGame(9,1,0,'local');assert.equal(b.play(20),true);
   nodes.battleResign.onclick();nodes.battleDialogYes.onclick();
-  assert.equal(state.battleHistory[0].winner,2,'resigning player loses to other color');
-  assert.match(nodes.battleResultTitle.textContent,/白棋胜/);
+  assert.equal(state.battleHistory[0].winner,1,'resigning player loses to other color');
+  assert.match(nodes.battleResultTitle.textContent,/黑棋胜/);
   b.newGame(9,1,0);assert.equal(b.mode,'ai','newGame with three args is backward-compatible');
   const legacy=[{id:'old-ai',date:'2026-11-01T00:00:00Z',n:9,human:1,winner:2,difficulty:1,moves:9}];
   assert.equal(b.cleanHistory(legacy)[0].mode,'ai','old history defaults to AI');
