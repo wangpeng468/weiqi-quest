@@ -165,7 +165,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     try {
         var s = JSON.parse(startupRaw || 'null');
         if (s && s.version === 2)
-            state = { version: 2, records: cleanRecords(s.records), lastId: typeof s.lastId === 'string' ? s.lastId : null, session: s.session && typeof s.session === 'object' ? s.session : null, battle: s.battle || null, battleHistory: Array.isArray(s.battleHistory) ? s.battleHistory.slice(0, 100) : [], battleVoids: Array.isArray(s.battleVoids) ? s.battleVoids.slice(0, 1000) : [], recordView: s.recordView === 'battle' ? 'battle' : 'lessons' };
+            state = { version: 2, records: cleanRecords(s.records), lastId: typeof s.lastId === 'string' ? s.lastId : null, session: s.session && typeof s.session === 'object' ? s.session : null, battle: s.battle || null, battleHistory: Array.isArray(s.battleHistory) ? s.battleHistory.slice(0, 200) : [], battleVoids: Array.isArray(s.battleVoids) ? s.battleVoids.slice(0, 1000) : [], recordView: ['battle', 'local'].indexOf(s.recordView) >= 0 ? s.recordView : 'lessons' };
     }
     catch (e) {
         storageOK = false;
