@@ -50,6 +50,10 @@ bash build_native.sh
 
 `npm install` 需要在开发电脑上获取前端开发依赖；**最终应用运行无需联网**。同理，语音模型不随仓库分发，只有离线生成的 MP3 文件。源码重建不必再次生成声音。
 
+## GitHub Actions 自动签名打包
+
+已经配置 [Build signed offline Android APK](.github/workflows/build-apk.yml)：推送 `main` 或手动触发即可构建并上传 APK。**必须先找回平板现有应用的原始签名私钥，并配置 GitHub Actions Secrets；否则工作流会安全失败，绝不会自动生成不兼容的新签名。** 配置、证书核对与下载方法详见 [GitHub APK 签名与构建指南](docs/GITHUB_APK_SIGNING.md)。
+
 ## 许可与使用限制
 
 - 本项目独立编写的代码采用 [MIT 许可证](LICENSE)。
