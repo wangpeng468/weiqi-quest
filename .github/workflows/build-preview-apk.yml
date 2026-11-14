@@ -100,7 +100,7 @@ jobs:
           apk=Path('dist/weiqi-quest-v2.9.2-preview.apk')
           info=json.loads(Path('build-info.json').read_text())
           assert info['package']=='org.weiqi.memory.preview'
-          assert info['version']=='2.9.1' and info['versionCode']==20902
+          assert info['version']=='2.9.2' and info['versionCode']==20902
           assert info['requestedPermissions']==[]
           assert verify_v2(apk.read_bytes())==info['certificateSha256']
           with ZipFile(apk) as z:
