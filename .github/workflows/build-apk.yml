@@ -1,0 +1,135 @@
+name: Build signed offline Android APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  apk:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android build tools
+        run: sdkmanager --install 'platforms;android-34' 'build-tools;34.0.0'
+
+      - name: Restore and verify bundled offline assets
+        run: python scripts/unpack_resources.py
+
+      - name: Build web assets
+        run: |
+          npm install --no-audit --no-fund
+          npm run web
+
+      - name: Install APK tooling
+        run: python -m pip install 'cryptography>=41' 'cairosvg>=2.7'
+
+      # The installed app MUST keep its original signer. Never generate a new key in CI.
+      - name: Restore original signing identity and verify certificate
+        shell: bash
+        env:
+          SIGNING_PRIVATE_KEY_B64: ${{ secrets.SIGNING_PRIVATE_KEY_B64 }}
+          SIGNING_CERTIFICATE_B64: ${{ secrets.SIGNING_CERTIFICATE_B64 }}
+          EXPECTED_CERT_SHA256: ${{ secrets.EXPECTED_CERT_SHA256 }}
+        run: |
+          set -euo pipefail
+          umask 077
+          if [[ -z "$SIGNING_PRIVATE_KEY_B64" || -z "$SIGNING_CERTIFICATE_B64" || -z "$EXPECTED_CERT_SHA256" ]]; then
+            echo "::error::Missing signing secrets. Restore ORIGINAL PEM key and DER certificate; do not create new ones."
+            exit 1
+          fi
+          mkdir -p private-signing
+          printf '%s' "$SIGNING_PRIVATE_KEY_B64" | base64 --decode > private-signing/weiqi-private.pem
+          printf '%s' "$SIGNING_CERTIFICATE_B64" | base64 --decode > private-signing/weiqi-certificate.der
+          python - <<'PY'
+          import hashlib, os, re
+          from pathlib import Path
+          from cryptography import x509
+          from cryptography.hazmat.primitives import serialization
+          directory = Path('private-signing')
+          key = serialization.load_pem_private_key((directory / 'weiqi-private.pem').read_bytes(), password=None)
+          cert = x509.load_der_x509_certificate((directory / 'weiqi-certificate.der').read_bytes())
+          assert key.public_key().public_numbers() == cert.public_key().public_numbers(), 'Private key does not match certificate'
+          actual = hashlib.sha256(cert.public_bytes(serialization.Encoding.DER)).hexdigest()
+          expected = re.sub(r'[^0-9a-f]', '', os.environ['EXPECTED_CERT_SHA256'].lower())
+          if len(expected) != 64 or actual != expected:
+              raise SystemExit('Certificate SHA-256 mismatch with expected INSTALLED app signing certificate; refusing build')
+          print('Original signing certificate confirmed (SHA-256):', actual)
+          PY
+
+      - name: Compile native shell and sign APK
+        env:
+          ANDROID_JAR: ${{ env.ANDROID_HOME }}/platforms/android-34/android.jar
+          D8_JAR: ${{ env.ANDROID_HOME }}/build-tools/34.0.0/lib/d8.jar
+        run: |
+          test -f "$ANDROID_JAR"
+          test -f "$D8_JAR"
+          bash build_native.sh
+
+      - name: Verify signed output and offline content
+        env:
+          EXPECTED_CERT_SHA256: ${{ secrets.EXPECTED_CERT_SHA256 }}
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile
+          import hashlib, json, os, re
+          from package_apk import verify_v2, PACKAGE
+          apks = list(Path('dist').glob('*.apk'))
+          assert len(apks) == 1, 'Expected exactly one APK'
+          apk = apks[0]
+          actual = verify_v2(apk.read_bytes())
+          expected = re.sub(r'[^0-9a-f]', '', os.environ['EXPECTED_CERT_SHA256'].lower())
+          assert actual == expected, 'Produced APK was signed by unexpected certificate'
+          with ZipFile(apk) as z:
+              assert z.testzip() is None, 'Corrupt ZIP entry'
+              names = set(z.namelist())
+              assert 'classes.dex' in names
+              assert 'assets/index.html' in names
+              assert len([n for n in names if n.startswith('assets/sgf/') and n.endswith('.sgf')]) == 420
+              assert len([n for n in names if n.startswith('assets/audio/') and n.endswith('.mp3')]) == 570
+              assert not any(n.endswith(('.pem','.jks','.keystore','.der')) for n in names)
+          info = json.loads(Path('build-info.json').read_text())
+          assert info['package'] == PACKAGE == 'org.weiqi.memory'
+          assert info['certificateSha256'] == actual
+          print('APK verified:', apk.name, 'bytes:', apk.stat().st_size, 'sha256:', hashlib.sha256(apk.read_bytes()).hexdigest())
+          PY
+
+      - name: Upload installable signed APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: weiqi-quest-signed-apk
+          path: |
+            dist/*.apk
+            build-info.json
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Remove signing files
+        if: always()
+        run: rm -rf private-signing
