@@ -11,7 +11,7 @@ assert.match(html,/id="voiceToggle"[\s\S]*id="soundToggle"/);
 assert.match(html,/<script src="sfx\.js"><\/script>/);
 assert.match(practice,/fx\('finish'\)/);
 assert.match(practice,/fx\(p<0\?'pass':'correct'\)/);
-assert.match(battle,/fx\('capture'/);
+assert.match(battle,/r\.captured&&r\.captured\.length\?'capture'/);
 assert.match(battle,/fx\('undo'\)/);
 
 function harness(initial,hasAudio){
