@@ -848,7 +848,7 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
             var game_1 = rebuild(raw.n, raw.moves);
             if (raw.phase === 'playing')
                 game_1.passes = Math.min(2, Math.max(0, Number(raw.passes) || 0));
-            return { game: game_1, human: raw.human, difficulty: [0, 1, 2].indexOf(raw.difficulty) >= 0 ? raw.difficulty : 1, phase: ['playing', 'scoring', 'finished', 'judging'].indexOf(raw.phase) >= 0 ? raw.phase : 'playing', dead: Array.isArray(raw.dead) ? raw.dead.filter(function (p) { return Number.isInteger(p) && p >= 0 && p < game_1.board.length && game_1.board[p]; }) : [], result: raw.result && typeof raw.result === 'object' ? raw.result : null, id: typeof raw.id === 'string' ? raw.id.slice(0, 80) : 'game-' + Date.now(), updatedAt: typeof raw.updatedAt === 'string' ? raw.updatedAt : '' };
+            return { game: game_1, human: raw.human, mode: raw.mode === 'local' ? 'local' : 'ai', difficulty: [0, 1, 2].indexOf(raw.difficulty) >= 0 ? raw.difficulty : 1, phase: ['playing', 'scoring', 'finished', 'judging'].indexOf(raw.phase) >= 0 ? raw.phase : 'playing', dead: Array.isArray(raw.dead) ? raw.dead.filter(function (p) { return Number.isInteger(p) && p >= 0 && p < game_1.board.length && game_1.board[p]; }) : [], result: raw.result && typeof raw.result === 'object' ? raw.result : null, id: typeof raw.id === 'string' ? raw.id.slice(0, 80) : 'game-' + Date.now(), updatedAt: typeof raw.updatedAt === 'string' ? raw.updatedAt : '' };
         }
         catch (e) {
             return null;
